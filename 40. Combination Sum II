@@ -1,0 +1,98 @@
+Given a collection of candidate numbers (C) and a target number (T), find all unique combinations in C where the candidate numbers sums to T.
+
+Each number in C may only be used once in the combination.
+
+Note:
+All numbers (including target) will be positive integers.
+The solution set must not contain duplicate combinations.
+For example, given candidate set [10, 1, 2, 7, 6, 1, 5] and target 8, 
+A solution set is: 
+[
+  [1, 7],
+  [1, 2, 5],
+  [2, 6],
+  [1, 1, 6]
+]
+
+class Solution {
+public:
+    void heapify(vector<int>& v,int i,int heap_size) {
+        int left=2*i+1;
+        int right=2*(i+1);
+        int largest;
+        if(left<heap_size&&v[left]>v[i]) {
+            largest=left;
+        }
+        else {
+            largest=i;
+        }
+        if(right<heap_size&&v[right]>v[largest]) {
+            largest=right;
+        }
+        if(largest!=i) {
+            int tmp=v[i];
+            v[i]=v[largest];
+            v[largest]=tmp;
+            heapify(v,largest,heap_size);
+        }
+    }
+    void build_max_heap(vector<int>& v) {
+        int sz=v.size()/2;
+        for(int i=sz;i!=-1;--i) {
+            heapify(v,i,v.size());
+        }
+    }
+    void heap_sort(vector<int>& v) {
+        int heap_size=v.size();
+        build_max_heap(v);
+        for(int i=v.size()-1;i!=0;--i) {
+            --heap_size;
+            int tmp=v[0];
+            v[0]=v[i];
+            v[i]=tmp;
+            heapify(v,0,heap_size);
+        }
+    }
+    void solve(vector<vector<int>>& re,vector<int>& can,stack<int>& s,int from,int target) {
+        if(target==0) {
+            vector<int> tmp;
+            stack<int> s2=s;
+            while(!s2.empty()) {
+                tmp.push_back(s2.top());
+                s2.pop();
+            }
+            heap_sort(tmp);
+            if(search(re,tmp)) {
+                re.push_back(tmp);
+            }
+            //re.push_back(tmp);
+        }
+        else {
+            for(int i=from;i<can.size()&&can[i]<=target;++i) {
+                s.push(can[i]);
+                solve(re,can,s,i+1,target-can[i]);
+                s.pop();
+            }
+        }
+    }
+    bool search(vector<vector<int>>& re,vector<int>& v) {
+        for(int i=0;i!=re.size();++i) {
+            if(re[i]==v) {
+                return false;
+            }
+        }
+        return true;
+    }
+    vector<vector<int>> combinationSum2(vector<int>& candidates, int target) {
+        vector<vector<int>> re;
+        if(candidates.empty()) {
+            return re;
+        }
+        heap_sort(candidates);
+        
+        stack<int> st;
+        int curr=candidates[0];
+        solve(re,candidates,st,0,target);
+        return re;
+    }
+};
