@@ -1,0 +1,67 @@
+Given a sorted array and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order.
+
+You may assume no duplicates in the array.
+
+Here are few examples.
+[1,3,5,6], 5 → 2
+[1,3,5,6], 2 → 1
+[1,3,5,6], 7 → 4
+[1,3,5,6], 0 → 0
+
+
+class Solution {
+public:
+    int binary_search(vector<int>& nums,int target,int p,int r) {
+        if(p<=r) {
+            int q=(p+r)/2;
+            if(nums[q]==target) {
+                return q;
+            }
+            else {
+                if(nums[q]<target) {
+                    return binary_search(nums,target,q+1,r);
+                }
+                else {
+                    return binary_search(nums,target,p,q-1);
+                }
+            }
+        }
+        else {
+            return -1;
+        }
+    }
+    int insert(vector<int>& nums,int target,int p,int r) {
+        if(p<=r) {
+            int q=(p+r)/2;
+            if(q==0&&nums[q]>target) {
+                return 0;
+            }
+            if(q==nums.size()-1&&nums[q]<target) {
+                return nums.size();
+            }
+            if(nums[q]>target&&nums[q-1]<target) {
+                return q;
+            }
+            else {
+                if(nums[q]<target) {
+                    return insert(nums,target,q+1,r);
+                }
+                else {
+                    return insert(nums,target,p,q-1);
+                }
+            }
+        }
+    }
+    int searchInsert(vector<int>& nums, int target) {
+        if(nums.empty()) {
+            return 0;
+        }
+        int pos=binary_search(nums,target,0,nums.size()-1);
+        if(pos!=-1) {
+            return pos;
+        }
+        else {
+            return insert(nums,target,0,nums.size()-1);
+        }
+    }
+};
