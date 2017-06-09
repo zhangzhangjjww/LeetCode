@@ -1,0 +1,40 @@
+plement strStr().
+
+Returns the index of the first occurrence of needle in haystack, or -1 if needle is not part of haystack.
+
+class Solution {
+public:
+    int strStr(string haystack, string needle) {
+        if(haystack.empty()&&needle.empty()) {
+            return 0;
+        }
+        if(haystack.size()<needle.size()) {
+            return -1;
+        }
+        int hs=0,ns=0;int pos=0;int tmp=0;
+        while(hs<haystack.size()&&ns<needle.size()) {
+            if(haystack[hs]==needle[ns]) {
+                if(ns==0) {
+                    pos=hs;
+                    tmp=hs+1;
+                }
+                ++hs;++ns;
+            }
+            else {
+                if(ns==0) {
+                    ++hs;
+                }
+                else {
+                    hs=tmp;
+                }
+                ns=0;
+            }
+        }
+        if(ns==needle.size()) {
+            return pos;
+        }
+        else {
+            return -1;
+        }
+    }
+};
