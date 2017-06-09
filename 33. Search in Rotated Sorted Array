@@ -1,0 +1,80 @@
+Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.
+
+(i.e., 0 1 2 4 5 6 7 might become 4 5 6 7 0 1 2).
+
+You are given a target value to search. If found in the array return its index, otherwise return -1.
+
+You may assume no duplicate exists in the array.
+
+class Solution {
+public:
+    int search2(vector<int>& nums,int p,int r) {
+        if(p<=r) {
+            int q=(p+r)/2;
+            if(q==0&&nums[0]>nums[1]) {
+                return 0;
+            }
+            //if(q==nums.size()-1&&nums[q]<)
+            if(q-1>-1&&q+1<nums.size()&&nums[q]>=nums[q-1]&&nums[q]>=nums[q+1]) {
+                return q;
+            }
+            else {
+                if(nums[q]<nums[p]) {
+                    return search2(nums,p,q-1);
+                }
+                else {
+                    return search2(nums,q+1,r);
+                }
+            }
+        }
+        else {
+            return nums.size()-1;
+        }
+    }
+    int search3(vector<int>& nums,int target,int p,int r) {
+        if(p<=r) {
+            int q=(p+r)/2;
+            if(nums[q]==target) {
+                return q;
+            }
+            else {
+                if(nums[q]<target) {
+                    return search3(nums,target,q+1,r);
+                }
+                else {
+                    return search3(nums,target,p,q-1);
+                }
+            }
+        }
+        else {
+            return -1;
+        }
+    }
+    int search(vector<int>& nums, int target) {
+        if(nums.empty()) {
+            return -1;
+        }
+        if(nums.size()==1) {
+            if(nums[0]==target) {
+                return 0;
+            }
+            else {
+                return -1;
+            }
+        }
+        int max=search2(nums,0,nums.size()-1);
+        if(target==nums[max]) {
+            return max;
+        }
+        else {
+            int key1=search3(nums,target,0,max-1);
+            int key2=search3(nums,target,max+1,nums.size()-1);
+            if(key1>=key2) {
+                return key1;
+            }
+            else {
+                return key2;
+            }
+        }
+    }
+};
