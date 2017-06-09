@@ -1,0 +1,68 @@
+Given a roman numeral, convert it to an integer.
+
+Input is guaranteed to be within the range from 1 to 3999.
+
+class Solution {
+public:
+    int romanToInt(string s) {
+        int re=0;
+        int i=0;
+        while(i!=s.size()) {
+            if(i+1<s.size()&&s[i]=='C'&&s[i+1]=='M') {
+                re+=900;
+                i=i+2;
+                continue;
+            }
+            if(i+1<s.size()&&s[i]=='X'&&s[i+1]=='C') {
+                re+=90;
+                i=i+2;
+                continue;
+            }
+            if(i+1<s.size()&&s[i]=='I'&&s[i+1]=='X') {
+                re+=9;
+                i=i+2;
+                continue;
+            }
+            if(i+1<s.size()&&s[i]=='C'&&s[i+1]=='D') {
+                re+=400;
+                i=i+2;
+                continue;
+            }
+            if(i+1<s.size()&&s[i]=='X'&&s[i+1]=='L') {
+                re+=40;
+                i=i+2;
+                continue;
+            }
+            if(i+1<s.size()&&s[i]=='I'&&s[i+1]=='V') {
+                re+=4;
+                i=i+2;
+                continue;
+            }
+            switch(s[i]) {
+                case 'M':
+                re+=1000;
+                break;
+                case 'D':
+                re+=500;
+                break;
+                case 'C':
+                re+=100;
+                break;
+                case 'L':
+                re+=50;
+                break;
+                case 'X':
+                re+=10;
+                break;
+                case 'V':
+                re+=5;
+                break;
+                case 'I':
+                re+=1;
+                break;
+            }
+            ++i;
+        }
+        return re;
+    }
+};
