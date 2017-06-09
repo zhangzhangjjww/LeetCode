@@ -1,0 +1,71 @@
+Given an array of integers sorted in ascending order, find the starting and ending position of a given target value.
+
+Your algorithm's runtime complexity must be in the order of O(log n).
+
+If the target is not found in the array, return [-1, -1].
+
+For example,
+Given [5, 7, 7, 8, 8, 10] and target value 8,
+return [3, 4].
+
+
+class Solution {
+public:
+    int find_first(vector<int>& nums,int target,int p,int r) {
+        if(p<=r) {
+            int q=(p+r)/2;
+            if(q==0&&nums[q]==target) {
+                return 0;
+            }
+            if(nums[q-1]<target&&nums[q]==target) {
+                return q;
+            }
+            else {
+                if(nums[q]>=target) {
+                    return find_first(nums,target,p,q-1);
+                }
+                else {
+                    return find_first(nums,target,q+1,r);
+                }
+            }
+        }
+        else {
+            return -1;
+        }
+    }
+    int find_last(vector<int>& nums,int target,int p,int r) {
+        if(p<=r) {
+            int q=(p+r)/2;
+            if(q==nums.size()-1&&nums[q]==target) {
+                return nums.size()-1;
+            }
+            if(nums[q+1]>target&&nums[q]==target) {
+                return q;
+            }
+            else {
+                if(nums[q]>target) {
+                    return find_last(nums,target,p,q-1);
+                }
+                else {
+                    return find_last(nums,target,q+1,r);
+                }
+            }
+        }
+        else {
+            return -1;
+        }
+    }
+    vector<int> searchRange(vector<int>& nums, int target) {
+        vector<int> re;
+        if(nums.empty()) {
+            re.push_back(-1);
+            re.push_back(-1);
+            return re;
+        }
+        int key1=find_first(nums,target,0,nums.size()-1);
+        int key2=find_last(nums,target,0,nums.size()-1);
+        re.push_back(key1);
+        re.push_back(key2);
+        return re;
+    }
+};
