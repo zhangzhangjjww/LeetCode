@@ -1,0 +1,66 @@
+The set [1,2,3,…,n] contains a total of n! unique permutations.
+
+By listing and labeling all of the permutations in order,
+We get the following sequence (ie, for n = 3):
+
+"123"
+"132"
+"213"
+"231"
+"312"
+"321"
+Given n and k, return the kth permutation sequence.
+
+Note: Given n will be between 1 and 9 inclusive.
+
+
+class Solution {
+public:
+    string getPermutation(int n, int k) {
+        string s;
+        if(n==0) {
+            return s;
+        }
+        if(n==1) {
+            s+='1';
+            return s;
+        }
+        //vector<string> re;
+        vector<int> val;
+        int* mul=new int[n];
+        mul[0]=1;
+        for(int i=2;i!=n+1;++i) {
+            mul[i-1]=mul[i-2]*i;
+        }
+        for(int i=1;i!=n+1;++i) {
+            val.push_back(i);
+        }
+        //int pos=0;
+        solve(s,val,mul,k);
+        delete [] mul;
+        return s;
+    }
+    void solve(string& s,vector<int> val,int* mul,int k) {
+        if(val.size()==1) {
+            s+=char(val[0]+'0');
+        }
+        else {
+            int sum=0;
+            int count=-1;
+            while(sum<k) {
+                ++count;
+                sum+=mul[val.size()-2];
+            }
+            s+=char(val[count]+'0');
+            vector<int> tmp;
+            for(int i=0;i<count;++i) {
+                tmp.push_back(val[i]);
+            }
+            for(int i=count+1;i<val.size();++i) {
+                tmp.push_back(val[i]);
+            }
+            k=k-count*mul[val.size()-2];
+            solve(s,tmp,mul,k);
+        }
+    }
+};
