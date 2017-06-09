@@ -1,0 +1,144 @@
+Merge k sorted linked lists and return it as one sorted list. Analyze and describe its complexity.
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    struct data {
+      int val;
+      int rank;
+      data& operator=(const data& d) {
+          val=d.val;
+          rank=d.rank;
+          return *this;
+      }
+    };
+    void heapify(vector<data>& v,int i,int heap_size) {
+        int l=2*i+1;
+        int r=2*(i+1);
+        int minist;
+        if(l<heap_size&&v[l].val<v[i].val) {
+            minist=l;
+        }
+        else {
+            minist=i;
+        }
+        if(r<heap_size&&v[r].val<v[minist].val) {
+            minist=r;
+        }
+        if(minist!=i) {
+            data tmp;
+            tmp=v[i];
+            v[i]=v[minist];
+            v[minist]=tmp;
+            heapify(v,minist,heap_size);
+        }
+    }
+    void build_min_heap(vector<data>& v) {
+        int sz=v.size()/2;
+        for(int i=sz;i!=-1;--i) {
+            heapify(v,i,v.size());
+        }
+    }
+    /*void heap_sort(vector<data>& v) {
+        int heap_size=v.size();
+        build_min_heap(v);
+        for(int i=v.size()-1;i!=0;--i) {
+            data tmp=v[0];
+            v[0]=v[i];
+            v[i]=tmp;
+            --heap_size;
+            heapify(v,0,heap_size);
+        }
+    }*/
+    data heap_extract_min(vector<data>& v,int& heap_size) {
+        if(heap_size<1) {
+            data tmp;
+            return tmp;
+        }
+        data min=v[0];
+        v[0]=v[heap_size-1];
+        --heap_size;
+        heapify(v,0,heap_size);
+        return min;
+    }
+    int parent(int i) {
+        if(i%2==0) {
+            return i/2-1;
+        }
+        else {
+            return (i-1)/2;
+        }
+    }
+    void heap_decrease_key(vector<data>& v,int i,int key) {
+        if(key>v[i].val) {
+            return ;
+        }
+        v[i].val=key;
+        while(i>0&&v[parent(i)].val>v[i].val) {
+            data tmp=v[i];
+            v[i]=v[parent(i)];
+            v[parent(i)]=tmp;
+            i=parent(i);
+        }
+    }
+    void min_heap_insert(vector<data>& v,data key,int& heap_size) {
+        heap_size++;
+        v[heap_size-1]=key;
+        v[heap_size-1].val=numeric_limits<int>::max();
+        heap_decrease_key(v,heap_size-1,key.val);
+    }
+    bool test(vector<ListNode*>& l) {
+        for(int i=0;i!=l.size();++i) {
+            if(l[i]!=NULL) {
+                return true;
+            }
+        }
+        return false;
+    }
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        vector<data> v;
+        if(lists.empty()) {
+            return NULL;
+        }
+        if(lists.size()==1) {
+            return lists[0];
+        }
+        for(int i=0;i!=lists.size();++i) {
+            data tmp;
+            if(lists[i]!=NULL) {
+            tmp.val=lists[i]->val;
+            tmp.rank=i;
+            v.push_back(tmp);
+            }
+        }
+        build_min_heap(v);
+        ListNode* re=NULL,*head=NULL;
+        int heap_size=v.size();
+        while(test(lists)) {
+            data min=heap_extract_min(v,heap_size);
+            if(re==NULL) {
+                re=lists[min.rank];
+                head=re;
+            }
+            else {
+                re->next=lists[min.rank];
+                re=lists[min.rank];
+            }
+            lists[min.rank]=lists[min.rank]->next;
+            if(lists[min.rank]!=NULL) {
+            data key;
+            key.rank=min.rank;
+            key.val=lists[min.rank]->val;
+            min_heap_insert(v,key,heap_size);
+            }
+        }
+        return head;
+    }
+};
