@@ -1,0 +1,137 @@
+Given an integer n, generate a square matrix filled with elements from 1 to n2 in spiral order.
+
+For example,
+Given n = 3,
+
+You should return the following matrix:
+[
+ [ 1, 2, 3 ],
+ [ 8, 9, 4 ],
+ [ 7, 6, 5 ]
+]
+
+class Solution {
+public:
+    vector<vector<int>> generateMatrix(int n) {
+        vector<vector<int>> re;
+        if(n==0) {
+            return re;
+        }
+        if(n==1) {
+            vector<int> tmp;
+            tmp.push_back(1);
+            re.push_back(tmp);
+            return re;
+        }
+        solve(re,0,n-1,0,n-1,1,n);
+        return re;
+    }
+    void solve(vector<vector<int>>& re,int row_start,int row_end,int col_start,int col_end,int value,int n) {
+        if(row_start>row_end||col_start>col_end) {
+            return;
+        }
+        if(row_start==row_end) {
+            re[row_start].push_back(value);
+            //++value;
+            int tmp=value;
+            for(int i=n-1;i!=col_start;--i) {
+                re[row_start][i]=re[row_start][i-1];
+            }
+            re[row_start][col_start]=value;
+            return;
+        }
+        else {
+            if(re.empty()) {
+                vector<int> tmp;
+                for(int i=col_start;i<col_end+1;++i) {
+                    tmp.push_back(value);
+                    ++value;
+                }
+                re.push_back(tmp);
+                for(int i=row_start+1;i<row_end+1;++i) {
+                    vector<int> tmp2;
+                    tmp2.push_back(value);
+                    re.push_back(tmp2);
+                    ++value;
+                }
+                for(int i=col_end-1;i>col_start-1;--i) {
+                    re[row_end].push_back(value);
+                    ++value;
+                }
+                for(int i=0,j=re[row_end].size()-1;i<j;++i,--j) {
+                    int key=re[row_end][i];
+                    re[row_end][i]=re[row_end][j];
+                    re[row_end][j]=key;
+                }
+                for(int i=row_end-1;i>row_start;--i) {
+                    re[i].push_back(value);
+                    value++;
+                }
+                for(int i=row_start+1;i<row_end;++i) {
+                    int key=re[i][0];
+                    re[i][0]=re[i][1];
+                    re[i][1]=key;
+                }
+                solve(re,row_start+1,row_end-1,col_start+1,col_end-1,value,n);
+            }
+            else {
+                int row1_sz=n-col_end-1;
+                for(int i=col_start;i<col_end+1;++i) {
+                    re[row_start].push_back(value);
+                    ++value;
+                }
+                vector<int> row1;
+                for(int i=0;i!=row1_sz;++i) {
+                    row1.push_back(re[row_start][col_start+i]);
+                }
+                for(int i=col_start;i<col_end+1;++i) {
+                    re[row_start][i]=re[row_start][i+row1_sz];
+                }
+                for(int i=0;i!=row1.size();++i) {
+                    re[row_start][col_end+1+i]=row1[i];
+                }
+                //
+                for(int i=row_start+1;i<row_end+1;++i) {
+                    int tmp=value;
+                    ++value;
+                    re[i].push_back(tmp);
+                    for(int j=row1_sz;j!=0;--j) {
+                        re[i][col_start+j]=re[i][col_start+j-1];
+                    }
+                    re[i][col_start]=tmp;
+                }
+                //
+                for(int i=col_end-1;i>col_start-1;--i) {
+                    re[row_end].push_back(value);
+                    ++value;
+                }
+                vector<int> row2;
+                for(int i=0;i!=row1_sz+1;++i) {
+                    row2.push_back(re[row_end][col_start+i]);
+                }
+                for(int i=col_start;i<col_end;++i) {
+                    re[row_end][i]=re[row_end][i+row1_sz+1];
+                }
+                for(int i=0;i!=row2.size();++i) {
+                    re[row_end][col_end+i]=row2[i];
+                }
+                for(int i=col_start,j=col_end-1;i<j;++i,--j) {
+                    int tmp=re[row_end][i];
+                    re[row_end][i]=re[row_end][j];
+                    re[row_end][j]=tmp;
+                }
+                //
+                for(int i=row_end-1;i>row_start;--i) {
+                    int tmp=value;
+                    ++value;
+                    re[i].push_back(tmp);
+                    for(int j=row1_sz+1;j!=0;--j) {
+                        re[i][col_start+j]=re[i][col_start+j-1];
+                    }
+                    re[i][col_start]=tmp;
+                }
+                solve(re,row_start+1,row_end-1,col_start+1,col_end-1,value,n);
+            }
+        }
+    }
+};
