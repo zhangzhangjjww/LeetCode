@@ -1,0 +1,92 @@
+he n-queens puzzle is the problem of placing n queens on an n×n chessboard such that no two queens attack each other.
+Given an integer n, return all distinct solutions to the n-queens puzzle.
+
+Each solution contains a distinct board configuration of the n-queens' placement, where 'Q' and '.' both indicate a queen and an empty space respectively.
+
+For example,
+There exist two distinct solutions to the 4-queens puzzle:
+
+[
+ [".Q..",  // Solution 1
+  "...Q",
+  "Q...",
+  "..Q."],
+
+ ["..Q.",  // Solution 2
+  "Q...",
+  "...Q",
+  ".Q.."]
+]
+
+class Solution {
+public:
+    vector<vector<string>> solveNQueens(int n) {
+       vector<vector<string>> re;
+       if(n==0||n==2||n==3) {
+           return re;
+       }
+       if(n==1) {
+           vector<string> tmp;
+           tmp.push_back("Q");
+           re.push_back(tmp);
+           return re;
+       }
+       vector<string> val;
+       vector<int> vol;
+       solve(re,0,val,vol,n);
+       return re;
+    }
+    void solve(vector<vector<string>>& re,int pos,vector<string> val,vector<int> vol,int n) {
+        if(pos==n) {
+            re.push_back(val);
+        }
+        else {
+            int i=0;
+            for(;i<n;++i) {
+                if(search(pos,i,vol)) {
+                    continue;
+                }
+                else {
+                    string s;
+                    for(int j=0;j<i;++j) {
+                        s+='.';
+                    }
+                    s+='Q';
+                    for(int j=i+1;j<n;++j) {
+                        s+='.';
+                    }
+                    vector<int> vol1=vol;
+                    vector<string> val1=val;
+                    val1.push_back(s);
+                    vol1.push_back(i);
+                    solve(re,pos+1,val1,vol1,n);
+                }
+            }
+        }
+    }
+    bool search(int row,int pos,vector<int>& vol) {
+        if(vol.empty()) {
+            return false;
+        }
+        for(int i=0;i!=vol.size();++i) {
+            if(vol[i]==pos) {
+                return true;
+            }
+        }
+        for(int i=0;i!=vol.size();++i) {
+            int key1=row-i;
+            int key2=pos-vol[i];
+            if(key2<0) {
+                key2=-key2;
+            }
+            if(key1==key2) {
+                return true;
+            }
+        }
+        int tmp=vol[vol.size()-1];
+        if(pos==tmp+1||pos==tmp-1) {
+            return true;
+        }
+        return false;
+    }
+};
