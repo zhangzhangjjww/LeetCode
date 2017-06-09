@@ -1,0 +1,61 @@
+Implement pow(x, n).
+
+二分法的解法，如同我们在Sqrt(x)的方法。不过这道题用递归来解比较容易理解，把x的n次方划分成两个x的n/2次方相乘，然后递归求解子问题，结束条件是n为0返回1。因为是对n进行二分，算法复杂度和上面方法一样，也是O(logn)。
+class Solution {
+public:
+    double myPow(double x, int n) {
+        if(n==0) {
+            return 1;
+        }
+        else {
+            if(x==0) {
+                return 0;
+            }
+        }
+        long double max=(long double)numeric_limits<double>::max();
+        long double min=(long double)numeric_limits<double>::min();
+        double sign=1;
+        if(x<0&&n%2==1) {
+            sign=-1;
+        }
+        if(x<0) {
+            x=-x;
+        }
+       // cout<<max<<" "<<min<<endl;
+       long double half=myPow(x,n/2);
+       long double sum;
+        if(n%2==0) {
+            sum=half*half;
+            if(sum>max) {
+                return max;
+            }
+            else {
+                if(sum<min) {
+                    return min;
+                }
+                else {
+                    return sum;
+                }
+            }
+        }
+        else {
+            if(n>0) {
+                sum=half*half*x;
+            }
+            else {
+                sum=half*half/x;
+            }
+            if(sum>max) {
+                return sign*max;
+            }
+            else {
+                if(sum<min) {
+                    return sign*min;
+                }
+                else {
+                    return sign*sum;
+                }
+            }
+        }
+    }
+};
