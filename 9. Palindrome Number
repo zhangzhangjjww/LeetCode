@@ -1,0 +1,48 @@
+Determine whether an integer is a palindrome. Do this without extra space.
+
+class Solution {
+public:
+    int exponent(int base,int pow) {
+        int sum=1;
+        if(pow<0) {
+            return sum;
+        }
+        for(int i=0;i!=pow;++i) {
+            sum*=base;
+        }
+        return sum;
+    }
+    bool isPalindrome(int x) {
+        int count=0;
+        int sum=x;
+        while(sum!=0) {
+            sum=sum/10;
+            ++count;
+        }
+        if(x<0) {
+            return false;
+        }
+        if(x<10&&x>=0) {
+            return true;
+        }
+        if(x%10==0) {
+            return false;
+        }
+        int a,b,c;
+        int i=0;
+        while(x!=0&&i<count) {
+            a=x%10;
+            b=x/exponent(10,count-1-i);
+           // cout<<x<<" "<<a<<" "<<b<<" "<<exponent(10,count-2-i)<<endl;
+            if(a!=b) {
+                return false;
+            }
+            else {
+                x=(x-b*exponent(10,count-i-1))/10;
+                i=i+2;
+            }
+
+        }
+        return true;
+    }
+};
