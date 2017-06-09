@@ -1,0 +1,65 @@
+Given a digit string, return all possible letter combinations that the number could represent.
+
+A mapping of digit to letters (just like on the telephone buttons) is given below.
+
+Input:Digit string "23"
+Output: ["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"].
+
+
+class Solution {
+public:
+    vector<string> letterCombinations(string digits) {
+        vector<string> re;
+        if(digits.empty()) {
+            return re;
+        }
+        string* p=new string[digits.size()];
+        for(int i=0;i!=digits.size();++i) {
+            if(digits[i]=='0'||digits[i]=='1'||digits[i]=='*'||digits[i]=='#') {
+                return re;
+            }
+            switch(digits[i]) {
+                case '2':
+                p[i]+="abc";
+                break;
+                case '3':
+                p[i]+="def";
+                break;
+                case '4':
+                p[i]+="ghi";
+                break;
+                case '5':
+                p[i]+="jkl";
+                break;
+                case '6':
+                p[i]+="mno";
+                break;
+                case '7':
+                p[i]+="pqrs";
+                break;
+                case '8':
+                p[i]+="tuv";
+                break;
+                case '9':
+                p[i]+="wxyz";
+                break;
+            }
+        }
+        for(int i=0;i!=p[0].size();++i) {
+            string s;
+            s+=p[0][i];
+            re.push_back(s);
+        }
+        for(int i=1;i!=digits.size();++i) {
+            vector<string> tmp;
+            for(int j=0;j!=p[i].size();++j) {
+                for(int k=0;k!=re.size();++k) {
+                    tmp.push_back(re[k]+p[i][j]);
+                }
+            }
+            re=tmp;
+        }
+        delete [] p;
+        return re;
+    }
+};
