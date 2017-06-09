@@ -1,0 +1,94 @@
+Given an array S of n integers, find three integers in S such that the sum is closest to a given number, target. Return the sum of the three integers. You may assume that each input would have exactly one solution.
+
+    For example, given array S = {-1 2 1 -4}, and target = 1.
+
+    The sum that is closest to the target is 2. (-1 + 2 + 1 = 2).
+    
+    
+    class Solution {
+public:
+    void heapify(vector<int>& v,int i,int heap_size) {
+        int l=2*i+1;
+        int r=2*(i+1);
+        int largest;
+        if(l<heap_size&&v[l]>v[i]) {
+            largest=l;
+        }
+        else {
+            largest=i;
+        }
+        if(r<heap_size&&v[r]>v[largest]) {
+            largest=r;
+        }
+        if(largest!=i) {
+            int tmp=v[i];
+            v[i]=v[largest];
+            v[largest]=tmp;
+            heapify(v,largest,heap_size);
+        }
+    }
+    void build_max_heap(vector<int>& v) {
+        int sz=v.size();
+        for(int i=sz/2;i!=-1;--i) {
+            heapify(v,i,v.size());
+        }
+    }
+    void heap_sort(vector<int>& v) {
+        int heap_size=v.size();
+        build_max_heap(v);
+        for(int i=v.size()-1;i!=0;--i) {
+            int tmp=v[0];
+            v[0]=v[i];
+            v[i]=tmp;
+            --heap_size;
+            heapify(v,0,heap_size);
+        }
+    }
+    void test(int& re,int tmp,int target) {
+        int x,y;
+        if(tmp>target) {
+            x=tmp-target;
+        }
+        else {
+            x=target-tmp;
+        }
+        if(re>target) {
+            y=re-target;
+        }
+        else {
+            y=target-re;
+        }
+        if(x<y) {
+            re=tmp;
+        }
+    }
+    int threeSumClosest(vector<int>& nums, int target) {
+        heap_sort(nums);
+        int re=nums[0]+nums[1]+nums[2];
+        int icurrent=nums[0];
+        for(int i=0;i!=nums.size();++i) {
+            int tmp=nums[i];
+            if(i!=0&&nums[i]==icurrent) {
+                continue;
+            }
+            int m=i+1;int n=nums.size()-1;
+            while(m<n) {
+                int sum=nums[m]+nums[n];
+                if(sum+tmp==target) {
+                    return target;
+                }
+                else {
+                    if(sum+tmp<target) {
+                        test(re,sum+tmp,target);
+                        ++m;
+                    }
+                    else {
+                        test(re,sum+tmp,target);
+                        --n;
+                    }
+                }
+            }
+        }
+        return re;
+    }
+};
