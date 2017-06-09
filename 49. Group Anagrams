@@ -1,0 +1,60 @@
+Given an array of strings, group anagrams together.
+
+For example, given: ["eat", "tea", "tan", "ate", "nat", "bat"], 
+Return:
+
+[
+  ["ate", "eat","tea"],
+  ["nat","tan"],
+  ["bat"]
+]
+
+class Solution {
+public:
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        vector<vector<string>> re;
+        if(strs.empty()) {
+            return re;
+        }
+        if(strs.size()==1) {
+            re.push_back(strs);
+            return re;
+        }
+        vector<vector<int>> vol;
+        for(int i=0;i!=strs.size();++i) {
+            vector<int> tmp;
+            for(int j=0;j!=strs[i].size();++j) {
+                int key=strs[i][j]-'a';
+                tmp.push_back(key);
+                sort(tmp.begin(),tmp.end());
+            }
+            insert(re,vol,tmp,strs[i]);
+        }
+        return re;
+    }
+    void insert(vector<vector<string>>& re,vector<vector<int>>& vol,vector<int> tmp,string s) {
+        if(re.empty()&&vol.empty()) {
+            vector<string> tt;
+            tt.push_back(s);
+            re.push_back(tt);
+            vol.push_back(tmp);
+        }
+        else {
+            int i=0;
+            for(;i!=vol.size();++i) {
+                if(tmp==vol[i]) {
+                    break;
+                }
+            }
+            if(i==vol.size()) {
+                vector<string> tt2;
+                tt2.push_back(s);
+                re.push_back(tt2);
+                vol.push_back(tmp);
+            }
+            else {
+                re[i].push_back(s);
+            }
+        }
+    }
+};
