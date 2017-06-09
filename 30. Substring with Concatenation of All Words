@@ -1,0 +1,77 @@
+You are given a string, s, and a list of words, words, that are all of the same length. Find all starting indices of substring(s) in s that is a concatenation of each word in words exactly once and without any intervening characters.
+
+For example, given:
+s: "barfoothefoobarman"
+words: ["foo", "bar"]
+
+You should return the indices: [0,9].
+(order does not matter).
+
+class Solution {
+public:
+    string get_string(string s,int i,int j) {
+        string re;
+        if(j>s.size()) {
+            return re;
+        }
+        for(int k=i;k!=j;++k) {
+            re+=s[k];
+        }
+        return re;
+    }
+    int test(string s,vector<string>& words,int words_size) {
+        for(int i=0;i!=words_size;++i) {
+            if(s==words[i]) {
+                return i;
+            }
+        }
+        return words_size;
+    }
+    vector<int> findSubstring(string s, vector<string>& words) {
+        vector<int> re;
+        if(s.empty()||words.empty()) {
+            return re;
+        }
+        int small_size=words[0].size();
+        string tmp=get_string(s,0,small_size);
+        int count=0;
+        vector<string> w=words;
+        int words_size=words.size();
+        int label=0;
+        while(count<s.size()) {
+            int val=test(tmp,w,words_size);
+            if(val==words_size) {
+                if(words_size==words.size()) {
+                    count+=1;
+                    tmp=get_string(s,count,count+small_size);
+                }
+                else {
+                    w=words;
+                    words_size=w.size();
+                    count=label+1;
+                    tmp=get_string(s,count,count+small_size);
+                }
+            }
+            else {
+                if(words_size==words.size()) {
+                    label=count;
+                }
+                string s1=w[val];
+                w[val]=w[words_size-1];
+                w[words_size-1]=s1;
+                --words_size;
+                if(words_size==0) {
+                    w=words;
+                    words_size=w.size();
+                    re.push_back(label);
+                    count=label+1;
+                    tmp=get_string(s,count,count+small_size);
+                    continue;
+                }
+                count+=small_size;
+                tmp=get_string(s,count,count+small_size);
+            }
+        }
+        return re;
+    }
+};
