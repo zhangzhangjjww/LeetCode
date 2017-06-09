@@ -1,0 +1,120 @@
+Given an array of words and a length L, format the text such that each line has exactly L characters and is fully (left and right) justified.
+
+You should pack your words in a greedy approach; that is, pack as many words as you can in each line. Pad extra spaces ' ' when necessary so that each line has exactly L characters.
+
+Extra spaces between words should be distributed as evenly as possible. If the number of spaces on a line do not divide evenly between words, the empty slots on the left will be assigned more spaces than the slots on the right.
+
+For the last line of text, it should be left justified and no extra space is inserted between words.
+
+For example,
+words: ["This", "is", "an", "example", "of", "text", "justification."]
+L: 16.
+
+Return the formatted lines as:
+[
+   "This    is    an",
+   "example  of text",
+   "justification.  "
+]
+Note: Each word is guaranteed not to exceed L in length.
+
+
+class Solution {
+public:
+    vector<string> fullJustify(vector<string>& words, int maxWidth) {
+        vector<string> re;
+        if(maxWidth==0) {
+            re=words;
+            return re;
+        }
+        cout<<words.size()<<endl;
+        int i=0;
+        while(i<words.size()) {
+            int length=words[i].size();
+            int j=i+1;
+            while(j<words.size()) {
+                length=length+words[j].size()+1;
+                if(length<=maxWidth) {
+                    ++j;
+                }
+                else {
+                    break;
+                }
+            }
+            if(j==words.size()) {
+                string tmp;
+                int count=0;
+                for(int k=i;k!=j;++k) {
+                    tmp+=words[k];
+                    count+=words[k].size();
+                    if(count<maxWidth) {
+                    tmp+=' ';
+                    count++;
+                    }
+                }
+                while(count<maxWidth) {
+                    tmp+=' ';
+                    ++count;
+                }
+                re.push_back(tmp);
+                return re;
+            }
+            else {
+                int word_size=0;
+                for(int k=i;k!=j;++k) {
+                    word_size+=words[k].size();
+                }
+                int word_number=j-i;
+                if(word_number==1) {
+                    int total_space=maxWidth-word_size;
+                    /*int left_space,right_space;
+                    if(total_space%2==0) {
+                        left_space=total_space/2;
+                        right_space=left_space;
+                    }
+                    else {
+                        left_space=(total_space+1)/2;
+                        right_space=(total_space-1)/2;
+                    }*/
+                    string tmp;
+                    /*for(int k=0;k!=left_space;++k) {
+                        tmp+=' ';
+                    }*/
+                    tmp+=words[i];
+                    for(int k=0;k!=total_space;++k) {
+                        tmp+=' ';
+                    }
+                    re.push_back(tmp);
+                }
+                else {
+                    int total_space=maxWidth-word_size;
+                    int each_space,res_space;
+                    if(total_space%(word_number-1)==0) {
+                        each_space=total_space/(word_number-1);
+                        res_space=0;
+                    }
+                    else {
+                        each_space=total_space/(word_number-1);
+                        res_space=total_space%(word_number-1);
+                    }
+                    string tmp;
+                    for(int k=i;k!=j;++k) {
+                        tmp+=words[k];
+                        if(k!=j-1) {
+                        for(int m=0;m!=each_space;++m) {
+                            tmp+=' ';
+                        }
+                        if(res_space!=0) {
+                            tmp+=' ';
+                            --res_space;
+                        }
+                        }
+                    }
+                    re.push_back(tmp);
+                }
+            }
+            i=j;
+        }
+        return re;
+    }
+};
