@@ -1,0 +1,59 @@
+Given a linked list, remove the nth node from the end of list and return its head.
+
+For example,
+
+   Given linked list: 1->2->3->4->5, and n = 2.
+
+   After removing the second node from the end, the linked list becomes 1->2->3->5.
+Note:
+Given n will always be valid.
+Try to do this in one pass.
+
+实这题很简单，知道了翻转链表的通用写法之后，解这一题其实就是循环翻转的过程（知道最后一个group长度不足）。
+
+先介绍下翻转链表的写法：
+1. 首先设置一个前置节点，将前置节点的next设置为头节点，以头节点为当前节点，开始循环
+2. 将当前节点的next赋给一个临时节点，然后将当前节点的next指向前置节点，随后依次位移前置节点指针和当前节点指针：前置节点指针指向当前节点，当前节点指针指向临时节点，这样就完成了一次循环
+3. 当前置节点指针指向尾节点时，循环结束
+
+有个这个翻转函数之后，只要对链表进行循环，当计数长度不k时，指针继续前进；当计数长度到达k时，将头尾节点作为参数传入翻转函数进行翻转，然后重新拼接到原链表中。直至到达链表末尾。
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        ListNode* pre=head,*p=head,*q=NULL;
+        ListNode* tmp=head;
+        for(int i=0;i!=n;++i) {
+            q=head;
+            head=head->next;
+        }
+        while(head!=0) {
+            pre=p;
+            p=p->next;
+            q=head;
+            head=head->next;
+        }
+        if(pre==p) {
+            p=p->next;
+            return p;
+        }
+        else {
+            if(p==q) {
+                pre->next=NULL;
+                return tmp;
+            }
+            else {
+                pre->next=p->next;
+                return tmp;
+            }
+        }
+    }
+};
