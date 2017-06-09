@@ -1,0 +1,143 @@
+Reverse digits of an integer.
+
+Example1: x = 123, return 321
+Example2: x = -123, return -321
+
+
+class Solution {
+public:
+    int exponent(int base,int pow) {
+        int sum=1;
+        for(int i=0;i!=pow;++i) {
+            sum*=base;
+        }
+        return sum;
+    }
+    string convert(int n) {
+        string res;
+        int x=n;int count=0;
+        while(x!=0) {
+            x=x/10;
+            ++count;
+        }
+        int* p=new int[count];int sum=n;
+        p[count-1]=sum/exponent(10,count-1);
+        for(int i=0;i!=count-1;++i) {
+            int tmp=sum%10;
+            p[i]=tmp;
+            sum=sum-tmp*1;
+            sum=sum/10;
+        }
+        for(int i=0;i!=count;++i) {
+            switch(p[i]) {
+                case 0:
+                res+='0';
+                break;
+                case 1:
+                res+='1';
+                break;
+                case 2:
+                res+='2';
+                break;
+                case 3:
+                res+='3';
+                break;
+                case 4:
+                res+='4';
+                break;
+                case 5:
+                res+='5';
+                break;
+                case 6:
+                res+='6';
+                break;
+                case 7:
+                res+='7';
+                break;
+                case 8:
+                res+='8';
+                break;
+                case 9:
+                res+='9';
+                break;
+            }
+        }
+        delete [] p;
+        return res;
+    }
+    int convert2(string s) {
+        int re=0;
+        for(int i=0;i!=s.size();++i) {
+            switch(s[i]) {
+                case '0':
+                re=re+0*exponent(10,s.size()-i-1);
+                break;
+                case '1':
+                re=re+1*exponent(10,s.size()-i-1);
+                break;
+                case '2':
+                re=re+2*exponent(10,s.size()-i-1);
+                break;
+                case '3':
+                re=re+3*exponent(10,s.size()-i-1);
+                break;
+                case '4':
+                re=re+4*exponent(10,s.size()-i-1);
+                break;
+                case '5':
+                re=re+5*exponent(10,s.size()-i-1);
+                break;
+                case '6':
+                re=re+6*exponent(10,s.size()-i-1);
+                break;
+                case '7':
+                re=re+7*exponent(10,s.size()-i-1);
+                break;
+                case '8':
+                re=re+8*exponent(10,s.size()-i-1);
+                break;
+                case '9':
+                re=re+9*exponent(10,s.size()-i-1);
+                break;
+            }
+        }
+        return re;
+    }
+    int reverse(int x) {
+        
+        if(x==0) {
+            return 0;
+        }
+        int maxv=2147483647;
+        int minv=-214748368;
+        string max("2147483647");
+        string min("2147483648");
+        string min2=convert(maxv);
+        min2[0]=8;
+        if(x>0) {
+            string s=convert(x);
+            if(s.size()>=max.size()&&s>max) {
+                return 0;
+            }
+            else {
+                return convert2(s);
+            }
+        }
+        else {
+            string s;
+            if(x==minv) {
+                s=min2;
+            }
+            else {
+                x=x*-1;
+                s=convert(x);
+            }
+            if(s.size()>=min.size()&&s>min) {
+                return 0;
+            }
+            else {
+                return convert2(s)*-1;
+            }
+        }
+    }
+};
