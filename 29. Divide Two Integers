@@ -1,0 +1,89 @@
+Divide two integers without using multiplication, division and mod operator.
+
+If it is overflow, return MAX_INT.
+
+
+不能用乘法，我们可以移位啊，移p位就相当于乘了2p
+
+举例说明我的方法：
+
+f(24,5)=24/5=20/5+4/5=4+0=4
+
+5左移2位就是20，而左移3位就是40超过了24，因此第一部分商为22=4.
+
+对余数4再进行分析，发现5不需要移位就比4大，因此第二部分商为0. 
+
+加和可得，商为4.
+
+注意：先提升为long long int，再对结果判断是否溢出会简化很多。
+
+
+class Solution {
+public:
+    long long divide2(int dividend,int divisor) {
+        long long sign=1;
+        long long dd=dividend,ds=divisor;
+        if((dividend>0&&divisor<0)||(dividend<0&&divisor>0)) {
+            sign=-1;
+        }
+        if(dividend<0) {
+                    dd=-(long long)dividend;
+                }
+                if(divisor<0) {
+                    ds=-(long long)divisor;
+                }
+        long long re=0;
+        while(ds<=dd) {
+            long long tmp=ds,pre=0;
+            long long pp=1;
+            long long count=0;
+            if(ds==dd) {
+                re+=1;
+                break;
+            }
+            while(tmp<dd) {
+                pre=tmp;
+                tmp=tmp<<1;
+                ++count;
+            }
+            if(tmp==dd) {
+                re+=pp<<count;
+             //   cout<<re<<endl;
+                break;
+            }
+            else {
+                re+=pp<<(count-1);
+                dd=dd-(ds<<(count-1));
+            }
+         //   cout<<re<<" "<<dd<<" "<<ds<<" "<<endl;
+        }
+        //cout<<re<<endl;
+        if(sign>0) {
+            return re;
+        }
+        else {
+            return -re;
+        }
+    }
+    int divide(int dividend, int divisor) {
+        if(divisor==0) {
+            return numeric_limits<int>::max();
+        }
+        else {
+            if(dividend==0) {
+                return 0;
+            }
+            else {
+                long long re=divide2(dividend,divisor);
+                //cout<<re<<endl;
+                if(re>numeric_limits<int>::max()||re<numeric_limits<int>::min()) {
+                    return numeric_limits<int>::max();
+                }
+                else {
+                    return re;
+                }
+            }
+        }
+    }
+    
+};
