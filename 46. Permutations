@@ -1,0 +1,53 @@
+Given a collection of distinct numbers, return all possible permutations.
+
+For example,
+[1,2,3] have the following permutations:
+[
+  [1,2,3],
+  [1,3,2],
+  [2,1,3],
+  [2,3,1],
+  [3,1,2],
+  [3,2,1]
+]
+
+class Solution {
+public:
+    vector<vector<int>> permute(vector<int>& nums) {
+        vector<vector<int>> re;
+        if(nums.size()==0) {
+            return re;
+        }
+        sort(nums.begin(),nums.end());
+        if(nums.size()==1) {
+            re.push_back(nums);
+            return re;
+        }
+        vector<int> tmp;
+        solve(re,nums,tmp);
+        return re;
+    }
+    vector<int> fix(vector<int>& nums,int s) {
+        vector<int> tmp;
+        for(int i=0;i<s;++i) {
+            tmp.push_back(nums[i]);
+        }
+        for(int i=s+1;i<nums.size();++i) {
+            tmp.push_back(nums[i]);
+        }
+        return tmp;
+    }
+    void solve(vector<vector<int>>& re,vector<int> nums,vector<int> tmp) {
+        if(nums.empty()) {
+            re.push_back(tmp);
+        }
+        else {
+            for(int i=0;i!=nums.size();++i) {
+                vector<int> tmp3=tmp;
+                tmp3.push_back(nums[i]);
+                vector<int> tmp2=fix(nums,i);
+                solve(re,tmp2,tmp3);
+            }
+        }
+    }
+};
