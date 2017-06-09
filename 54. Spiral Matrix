@@ -1,0 +1,67 @@
+iven a matrix of m x n elements (m rows, n columns), return all elements of the matrix in spiral order.
+
+For example,
+Given the following matrix:
+
+[
+ [ 1, 2, 3 ],
+ [ 4, 5, 6 ],
+ [ 7, 8, 9 ]
+]
+You should return [1,2,3,6,9,8,7,4,5].
+
+class Solution {
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        vector<int> re;
+        if(matrix.size()==0) {
+            return re;
+        }
+        if(matrix.size()==1) {
+            re=matrix[0];
+            return re;
+        }
+        /*if(matrix[0].size()==1) {
+            for(int i=0;i!=matrix.size();++i) {
+                re.push_back(matrix[i][0]);
+            }
+            return re;
+        }*/
+        solve(re,matrix,0,matrix.size()-1,0,matrix[0].size()-1);
+        return re;
+    }
+    void solve(vector<int>& re,vector<vector<int>>& ma,int row_start,int row_end,int col_start,int col_end) {
+        if(col_end<col_start||row_end<row_start) {
+            return;
+        }
+        if(row_end==row_start) {
+            for(int i=col_start;i!=col_end+1;++i) {
+                re.push_back(ma[row_start][i]);
+            }
+            return;
+        }
+        else {
+            if(col_start==col_end) {
+                for(int i=row_start;i!=row_end+1;++i) {
+                    re.push_back(ma[i][col_start]);
+                }
+                return;
+            }
+            else {
+                for(int i=col_start;i<col_end+1;++i) {
+                    re.push_back(ma[row_start][i]);
+                }
+                for(int i=row_start+1;i<row_end+1;++i) {
+                    re.push_back(ma[i][col_end]);
+                }
+                for(int i=col_end-1;i>col_start-1;--i) {
+                    re.push_back(ma[row_end][i]);
+                }
+                for(int i=row_end-1;i>row_start;--i) {
+                    re.push_back(ma[i][col_start]);
+                }
+                solve(re,ma,row_start+1,row_end-1,col_start+1,col_end-1);
+            }
+        }
+    }
+};
