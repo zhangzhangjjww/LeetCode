@@ -1,0 +1,85 @@
+Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses.
+
+For example, given n = 3, a solution set is:
+
+[
+  "((()))",
+  "(()())",
+  "(())()",
+  "()(())",
+  "()()()"
+]
+
+
+class Solution {
+public:
+    struct data {
+        string para;
+        int left;
+        int right;
+    };
+    vector<string> generateParenthesis(int n) {
+        vector<string> re;
+        if(n==0) {
+            return re;
+        }
+        if(n==1) {
+            string s("()");
+            re.push_back(s);
+            return re;
+        }
+        vector<data> d;
+        data first;
+        first.para="(";
+        first.left=1;
+        first.right=0;
+        int count=1;
+        d.push_back(first);
+        while(count<2*n) {
+            vector<data> tmp;
+            for(int i=0;i!=d.size();++i) {
+                if(d[i].left==n&&d[i].right==n) {
+                    tmp.push_back(d[i]);
+                    continue;
+                }
+                if(d[i].left==n&&d[i].right<n) {
+                    while(d[i].right<n) {
+                        d[i].para+=")";
+                        d[i].right++;
+                    }
+                    tmp.push_back(d[i]);
+                    continue;
+                }
+                data tmp2,tmp3;
+                if(d[i].para[d[i].para.size()-1]==')') {
+                    tmp2.para=d[i].para+"(";
+                    tmp2.left=d[i].left+1;
+                    tmp2.right=d[i].right;
+                    tmp.push_back(tmp2);
+                    if(d[i].left>d[i].right) {
+                        tmp3.para=d[i].para+")";
+                        tmp3.left=d[i].left;
+                        tmp3.right=d[i].right+1;
+                        tmp.push_back(tmp3);
+                    }
+                }
+                else {
+                    tmp2.para=d[i].para+"(";
+                    tmp2.left=d[i].left+1;
+                    tmp2.right=d[i].right;
+                    tmp.push_back(tmp2);
+                    tmp3.para=d[i].para+")";
+                    tmp3.left=d[i].left;
+                    tmp3.right=d[i].right+1;
+                    tmp.push_back(tmp3);
+                }
+            }
+            d=tmp;
+            ++count;
+        }
+        for(int i=0;i!=d.size();++i) {
+            re.push_back(d[i].para);
+        }
+        return re;
+    }
+};
