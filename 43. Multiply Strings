@@ -1,0 +1,101 @@
+Given two non-negative integers num1 and num2 represented as strings, return the product of num1 and num2.
+
+Note:
+
+The length of both num1 and num2 is < 110.
+Both num1 and num2 contains only digits 0-9.
+Both num1 and num2 does not contain any leading zero.
+You must not use any built-in BigInteger library or convert the inputs to integer directly.
+
+
+class Solution {
+public:
+    string single_multiply(string& n1,char c) {
+        int key=c-'0';
+        int next=0,now=0;
+        string re;
+        for(int i=n1.size()-1;i!=-1;--i) {
+            int tmp=n1[i]-'0';
+            now=key*tmp+next;
+            next=now/10;
+            now=now%10;
+            re+=char(now+'0');
+        }
+        if(next!=0) {
+            re+=char(next+'0');
+        }
+        for(int i=0,j=re.size()-1;i<j;++i,--j) {
+            char ss=re[i];
+            re[i]=re[j];
+            re[j]=ss;
+        }
+        return re;
+    }
+    string add(string s1,string& s2) {
+        int next=0,now=0;
+        string re;
+        int i=s1.size()-1,j=s2.size()-1;
+        while(i>-1&&j>-1) {
+            int key1=s1[i]-'0';
+            int key2=s2[j]-'0';
+            now=key1+key2+next;
+            next=now/10;
+            now=now%10;
+            re+=char(now+'0');
+            --i;--j;
+        }
+        if(i==-1) {
+            while(j>-1) {
+                int key2=s2[j]-'0';
+                now=key2+next;
+                next=now/10;
+                now=now%10;
+                re+=char(now+'0');
+                --j;
+            } 
+        }
+        else {
+            while(i>-1) {
+                int key1=s1[i]-'0';
+                now=key1+next;
+                next=next/10;
+                now=now%10;
+                re+=char(now+'0');
+                --i;
+            }
+        }
+        if(next!=0) {
+            re+=char(next+'0');
+        }
+        for(int k1=0,k2=re.size()-1;k1<k2;++k1,--k2) {
+            char ss=re[k1];
+            re[k1]=re[k2];
+            re[k2]=ss;
+        }
+        return re;
+    }
+    string multiply(string num1, string num2) {
+        int pos=0;
+        string re;
+        if(num1[0]=='0'||num2[0]=='0') {
+            re+='0';
+            return re;
+        }
+        for(int i=num2.size()-1;i!=-1;--i) {
+            string tmp1=single_multiply(num1,num2[i]);
+            int j=0;
+            while(j<pos) {
+                tmp1+='0';
+                ++j;
+            }
+            ++pos;
+            if(re.empty()) {
+                re=tmp1;
+            }
+            else {
+                re=add(re,tmp1);
+            }
+        }
+        return re;
+    }
+};
