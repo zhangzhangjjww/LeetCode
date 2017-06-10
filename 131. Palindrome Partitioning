@@ -11,18 +11,7 @@ Return
 ]
 
 
-DP.
 
-res[i] 区间[i,n]之间最小的cut数，n为字符串长度， 则,
-
-res[i] = min(1+res[j+1], res[i] ) i<=j
-
-有个转移函数之后，一个问题出现了，就是如何判断[i,j]是否是回文？每次都从i到j比较一遍？太浪费了，这里也是一个DP问题。
-定义函数
-P[i][j] = true if [i,j]为回文
-
-那么
-P[i][j] = (str[i] == str[j] && P[i+1][j-1]);
 
 
 class Solution {
