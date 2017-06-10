@@ -1,0 +1,62 @@
+Given a string s, partition s such that every substring of the partition is a palindrome.
+
+Return the minimum cuts needed for a palindrome partitioning of s.
+
+For example, given s = "aab",
+Return 1 since the palindrome partitioning ["aa","b"] could be produced using 1 cut.
+
+
+s[i] 区间[i,n]之间最小的cut数，n为字符串长度， 则,
+
+res[i] = min(1+res[j+1], res[i] ) i<=j
+
+有个转移函数之后，一个问题出现了，就是如何判断[i,j]是否是回文？每次都从i到j比较一遍？太浪费了，这里也是一个DP问题。
+定义函数
+P[i][j] = true if [i,j]为回文
+
+那么
+P[i][j] = (str[i] == str[j] && P[i+1][j-1]);
+
+
+class Solution {
+public:
+    int minCut(string s) {
+        if(s.empty()) {
+            return 0;
+        }
+        int n=s.size();
+        int** re=new int*[n];
+        for(int i=0;i!=n;++i) {
+            re[i]=new int[n];
+        }
+        for(int i=0;i!=n;++i) {
+            for(int j=0;j!=n;++j) {
+                re[i][j]=0;
+            }
+        }
+        for(int i=0;i!=n;++i) {
+            re[i][i]=1;
+        }
+        int* count=new int[n+1];
+        for(int i=0;i!=n+1;++i) {
+            count[i]=n-i;
+        }
+        for(int i=n-1;i>-1;--i) {
+            for(int j=i;j!=n;++j) {
+                if((s[i]==s[j])&&((j-i<2)||(re[i+1][j-1]==1))) {
+                    re[i][j]=1;
+                    if(count[i]>count[j+1]+1) {
+                        count[i]=count[j+1]+1;
+                    }
+                }
+            }
+        }
+        int min=count[0]-1;
+        for(int i=0;i!=n;++i) {
+            delete [] re[i];
+        }
+        delete [] re;
+        delete [] count;
+        return min;
+    }
+};
