@@ -1,0 +1,72 @@
+Given a string containing only digits, restore it by returning all possible valid IP address combinations.
+
+For example:
+Given "25525511135",
+
+return ["255.255.11.135", "255.255.111.35"]. (Order does not matter)
+
+
+class Solution {
+public:
+    vector<string> restoreIpAddresses(string s) {
+        vector<string> re;
+        if(s.empty()) {
+            return re;
+        }
+        string vol=s;
+        string val;
+        solve(re,val,vol,0);
+        return re;
+    }
+    void solve(vector<string>& re,string val,string vol,int k) {
+        if(k==4) {
+            if(vol.size()==0) {
+                re.push_back(val);
+            }
+        }
+        else {
+            if(vol.size()>0) {
+                string val2=val;
+                val2+=vol[0];
+                if(k!=3) {
+                    val2+='.';
+                }
+                string vol2;
+                for(int i=1;i<vol.size();++i) {
+                    vol2+=vol[i];
+                }
+                solve(re,val2,vol2,k+1);
+            }
+            if(vol.size()>1&&vol[0]!='0') {
+                string val2=val;
+                val2+=vol[0];
+                val2+=vol[1];
+                if(k!=3) {
+                    val2+='.';
+                }
+                string vol2;
+                for(int i=2;i<vol.size();++i) {
+                    vol2+=vol[i];
+                }
+                solve(re,val2,vol2,k+1);
+            }
+            if(vol.size()>2&&vol[0]!='0') {
+                int key=(vol[0]-'0')*100+(vol[1]-'0')*10+vol[2]-'0';
+                if(key<=255) {
+                    string val2=val;
+                    val2+=vol[0];
+                    val2+=vol[1];
+                    val2+=vol[2];
+                    if(k!=3) {
+                        val2+='.';
+                    }
+                    string vol2;
+                    for(int i=3;i<vol.size();++i) {
+                        vol2+=vol[i];
+                    }
+                    solve(re,val2,vol2,k+1);
+                }
+            }
+        }
+    }
+};
