@@ -1,0 +1,30 @@
+Given an array of integers, every element appears three times except for one, which appears exactly once. Find that single one.
+
+Note:
+Your algorithm should have a linear runtime complexity. Could you implement it without using extra memory?
+
+
+
+这里我们需要重新思考，计算机是怎么存储数字的。考虑全部用二进制表示，如果我们把 第 ith  个位置上所有数字的和对3取余，那么只会有两个结果 0 或 1 (根据题意，3个0或3个1相加余数都为0).  因此取余的结果就是那个 “Single Number”.
+
+一个直接的实现就是用大小为 32的数组来记录所有 位上的和。
+nt 数据共有32位，可以用32变量存储 这 N 个元素中各个二进制位上  1  出现的次数，最后 在进行 模三 操作，如果为1，那说明这一位是要找元素二进制表示中为 1 的那一位
+
+
+每次循环先计算 twos，即出现两次的 1 的分布，然后计算出现一次的 1 的分布，接着 二者进行与操作得到出现三次的 1 的分布情况，然后对 threes 取反，再与 ones、twos进行与操作，这样的目的是将出现了三次的位置清零。
+
+
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        int one=0,two=0,three=0;
+        for(int i=0;i!=nums.size();++i) {
+            two|=one&nums[i];
+            one^=nums[i];
+            three=one&two;
+            one&=~three;
+            two&=~three;
+        }
+        return one;
+    }
+};
