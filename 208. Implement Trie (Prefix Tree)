@@ -1,0 +1,83 @@
+mplement a trie with insert, search, and startsWith methods.
+
+Note:
+You may assume that all inputs are consist of lowercase letters a-z.
+
+
+
+class Trie {
+private:
+    struct Node {
+        Node* next[26];
+        string s;
+        char c;
+        Node() {for(int i=0;i!=26;++i) next[i]=NULL;}
+    };
+    Node* root;
+public:
+    /** Initialize your data structure here. */
+    Trie():root(NULL) {
+        root=new Node();
+        root->c='.';
+    }
+    
+    /** Inserts a word into the trie. */
+    void insert(string word) {
+        Node* p=root;
+        for(int i=0;i<word.size();++i) {
+            if(p->next[word[i]-'a']==NULL) {
+                p->next[word[i]-'a']=new Node();
+                p->next[word[i]-'a']->c=word[i];
+            }
+            if(i==word.size()-1) {
+                p->next[word[i]-'a']->s=word;
+            }
+            p=p->next[word[i]-'a'];
+        }
+    }
+    
+    /** Returns if the word is in the trie. */
+    bool search(string word) {
+        Node* p=root;
+        for(int i=0;i!=word.size();++i) {
+            if(p->next[word[i]-'a']!=NULL) {
+                if(i==word.size()-1) {
+                    if(p->next[word[i]-'a']->s==word) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                p=p->next[word[i]-'a'];
+            }
+            else {
+                return false;
+            }
+        }
+        return false;
+        
+    }
+    
+    /** Returns if there is any word in the trie that starts with the given prefix. */
+    bool startsWith(string prefix) {
+        Node* p=root;
+        for(int i=0;i!=prefix.size();++i) {
+            if(p->next[prefix[i]-'a']!=NULL) {
+                p=p->next[prefix[i]-'a'];
+            }
+            else {
+                return false;
+            }
+        }
+        return true;
+    }
+};
+
+/**
+ * Your Trie object will be instantiated and called as such:
+ * Trie obj = new Trie();
+ * obj.insert(word);
+ * bool param_2 = obj.search(word);
+ * bool param_3 = obj.startsWith(prefix);
+ */
