@@ -1,0 +1,117 @@
+Design a data structure that supports the following two operations:
+
+void addWord(word)
+bool search(word)
+search(word) can search a literal word or a regular expression string containing only letters a-z or .. A . means it can represent any one letter.
+
+For example:
+
+addWord("bad")
+addWord("dad")
+addWord("mad")
+search("pad") -> false
+search("bad") -> true
+search(".ad") -> true
+search("b..") -> true
+
+
+
+class WordDictionary {
+private:
+    struct Node {
+        string s;
+        char c;
+        Node* next[26];
+        Node() {
+            for(int i=0;i!=26;++i)  {
+                next[i]=NULL;
+            }
+        }
+    };
+    Node* root;
+    bool solve(Node* p,string word,int pos) {
+        if(pos==word.size()-1) {
+            if(word[pos]=='.') {
+                for(int i=0;i!=26;++i) {
+                    if(p->next[i]!=NULL) {
+                        word[pos]=char('a'+i);
+                        if(word==p->next[i]->s) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+            else {
+                if(p->next[word[pos]-'a']!=NULL&&p->next[word[pos]-'a']->s==word) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+        else {
+            if(word[pos]=='.') {
+                vector<bool> re;
+                for(int i=0;i!=26;++i) {
+                    if(p->next[i]!=NULL) {
+                         word[pos]=char('a'+i);
+                         bool key=solve(p->next[i],word,pos+1);
+                         re.push_back(key);
+                         //cout<<word<<" "<<key<<" "<<pos<<endl;
+                    }
+                }
+                for(int i=0;i!=re.size();++i) {
+                    if(re[i]) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            else {
+                if(p->next[word[pos]-'a']!=NULL) {
+                    //cout<<word<<" "<<pos<<endl;
+                    return solve(p->next[word[pos]-'a'],word,pos+1);
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+    }
+public:
+    /** Initialize your data structure here. */
+    WordDictionary():root(NULL) {
+        root=new Node();
+        root->c='/';
+    }
+    
+    /** Adds a word into the data structure. */
+    void addWord(string word) {
+        Node* p=root;
+        for(int i=0;i!=word.size();++i) {
+            if(p->next[word[i]-'a']==NULL) {
+                p->next[word[i]-'a']=new Node();
+                p->next[word[i]-'a']->c=word[i];
+            }
+            if(i==word.size()-1) {
+                p->next[word[i]-'a']->s=word;
+            }
+            p=p->next[word[i]-'a'];
+        }
+    }
+    
+    /** Returns if the word is in the data structure. A word could contain the dot character '.' to represent any one letter. */
+    bool search(string word) {
+        Node* p=root;
+        return solve(p,word,0);
+    }
+};
+
+/**
+ * Your WordDictionary object will be instantiated and called as such:
+ * WordDictionary obj = new WordDictionary();
+ * obj.addWord(word);
+ * bool param_2 = obj.search(word);
+ */
