@@ -1,0 +1,82 @@
+Given two integers representing the numerator and denominator of a fraction, return the fraction in string format.
+
+If the fractional part is repeating, enclose the repeating part in parentheses.
+
+For example,
+
+Given numerator = 1, denominator = 2, return "0.5".
+Given numerator = 2, denominator = 1, return "2".
+Given numerator = 2, denominator = 3, return "0.(6)".
+
+
+难点：如何识别循环体？
+
+解决方法：用一个HashMap记录每一个余数，当出现重复的余数时，那么将会进入循环，两个重复余数之间的部分就是循环体。
+
+示例：1/13=0.076923076923076923...，当小数部分第二次出现0时，就意味着开始了循环，那么需要把076923用括号括起来，结果为0.(076923)。
+
+涉及技巧：1）在不断相除的过程中，把余数乘以10再进行下一次相除，保证一直是整数相除；2）HashMap的key和value分别是<当前余数, 对应结果下标>，这样获取076923时就可根据value值来找。
+
+注意点1：考虑正负数，先判断符号，然后都转化为正数；
+
+注意点2：考虑溢出，如果输入为Integer.MIN_VALUE，取绝对值后会溢出。
+
+
+class Solution {
+public:
+    string fractionToDecimal(int numerator, int denominator) {
+        string re;
+        if(denominator==0) {
+            return re;
+        }
+        if(numerator==0) {
+            re+="0";
+            return re;
+        }
+        long nu=numerator,de=denominator;
+        if((nu>0&&de<0)||(nu<0&&de>0)) {
+            re+="-";
+        }
+        nu=abs(nu);de=abs(de);
+        long a=nu/de;
+        re+=change(a);
+        long rem=nu%de;
+        rem*=10;
+        if(rem==0) {
+            return re;
+        }
+        re+=".";
+        map<int,int> m;
+        //m[rem]=re.size();
+        while(rem!=0) {
+            if(m.count(rem)!=0) {
+                int pos=m[rem];
+                string s1=re.substr(0,pos);
+                string s2=re.substr(pos,re.size()-pos);
+                re=s1+"("+s2+")";
+                return re;
+            }
+            m[rem]=re.size();
+            long tmp=rem/de;
+            re+=change(tmp);
+            rem=(rem%de)*10;
+        }
+        return re;
+    }
+    string change(long n) {
+        if(n==0) {
+            return string("0");
+        }
+        string re;
+        while(n!=0) {
+            re+=char('0'+n%10);
+            n=n/10;
+        }
+        for(int i=0,j=re.size()-1;i<j;++i,--j) {
+            char c=re[i];
+            re[i]=re[j];
+            re[j]=c;
+        }
+        return re;
+    }
+};
