@@ -1,0 +1,79 @@
+Given a string s, partition s such that every substring of the partition is a palindrome.
+
+Return all possible palindrome partitioning of s.
+
+For example, given s = "aab",
+Return
+
+[
+  ["aa","b"],
+  ["a","a","b"]
+]
+
+
+DP.
+
+res[i] 区间[i,n]之间最小的cut数，n为字符串长度， 则,
+
+res[i] = min(1+res[j+1], res[i] ) i<=j
+
+有个转移函数之后，一个问题出现了，就是如何判断[i,j]是否是回文？每次都从i到j比较一遍？太浪费了，这里也是一个DP问题。
+定义函数
+P[i][j] = true if [i,j]为回文
+
+那么
+P[i][j] = (str[i] == str[j] && P[i+1][j-1]);
+
+
+class Solution {
+public:
+    vector<vector<string>> partition(string s) {
+        vector<vector<string>> re;
+        if(s.empty()) {
+            return re;
+        }
+        int n=s.size();
+        
+        for(int i=0;i!=n;++i) {
+            if(is(s,0,i)) {
+                vector<string> v;
+                string s2;
+                for(int j=0;j!=i+1;++j) {
+                    s2+=s[j];
+                }
+                v.push_back(s2);
+                solve(re,i+1,v,s);
+            }
+        }
+        return re;
+    }
+    int is(string s,int beg,int end) {
+        if(beg==end) {
+            return 1;
+        }
+        for(int i=beg,j=end;i<j;++i,--j) {
+            if(s[i]!=s[j]) {
+                return 0;
+            }
+        }
+        return 1;
+    }
+    void solve(vector<vector<string>>& re,int pos,vector<string> v,string s) {
+        if(pos==s.size()) {
+            re.push_back(v);
+        }
+        else {
+            for(int i=pos;i<s.size();++i) {
+                if(is(s,pos,i)) {
+                    vector<string> v2=v;
+                    string s2;
+                    for(int j=pos;j<i+1;++j) {
+                        s2+=s[j];
+                    }
+                    v2.push_back(s2);
+                    solve(re,i+1,v2,s);
+                }
+            }
+        }
+    }
+};
