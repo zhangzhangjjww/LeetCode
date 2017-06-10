@@ -1,0 +1,77 @@
+Follow up for "Search in Rotated Sorted Array":
+What if duplicates are allowed?
+
+Would this affect the run-time complexity? How and why?
+Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.
+
+(i.e., 0 1 2 4 5 6 7 might become 4 5 6 7 0 1 2).
+
+Write a function to determine if a given target is in the array.
+
+The array may contain duplicates.
+
+class Solution {
+public:
+    bool search(vector<int>& nums, int target) {
+        if(nums.empty()) {
+            return false;
+        }
+        if(nums.size()==1) {
+            return target==nums[0];
+        }
+        int max=0;
+        max=search_max(nums,0,nums.size()-1);
+        cout<<max<<endl;
+        if(target>nums[max]) {
+            return false;
+        }
+        return search(nums,0,max,target)||search(nums,max+1,nums.size()-1,target);
+    }
+    int search_max(vector<int>& nums,int p,int r) {
+        if(p<=r) {
+            int q=(p+r)/2;
+            if((q==0&&nums[q]>nums[q+1])||(q!=0&&q!=nums.size()-1&&nums[q]>nums[q+1]&&nums[q]>=nums[q-1])) {
+                return q;
+            }
+            else {
+                if(nums[q]!=nums[0]) {
+                    if(nums[q]>nums[0]) {
+                        return search_max(nums,q+1,r);
+                    }
+                    else {
+                        return search_max(nums,p,q-1);
+                    }
+                }
+                else {
+                    int key1=search_max(nums,p,q-1);
+                    int key2=search_max(nums,q+1,r);
+                    if(key1!=nums.size()-1) {
+                        return key1;
+                    }
+                    if(key2!=nums.size()-1) {
+                        return key2;
+                    }
+                    return nums.size()-1;
+                }
+            }
+        }
+        return nums.size()-1;
+    }
+    bool search(vector<int>& nums,int p,int r,int target) {
+        if(p<=r) {
+            int q=(p+r)/2;
+            if(nums[q]==target) {
+                return true;
+            }
+            else {
+                if(target<nums[q]) {
+                    return search(nums,p,q-1,target);
+                }
+                else {
+                    return search(nums,q+1,r,target);
+                }
+            }
+        }
+        return false;
+    }
+};
