@@ -1,0 +1,60 @@
+Given an integer n, generate all structurally unique BST's (binary search trees) that store values 1...n.
+
+For example,
+Given n = 3, your program should return all 5 unique BST's shown below.
+
+   1         3     3      2      1
+    \       /     /      / \      \
+     3     2     1      1   3      2
+    /     /       \                 \
+   2     1         2                 3
+   
+   思路：
+思路1：用递归的方式做，将n个字母排布成n*(n-1)/2种序列并考虑是否满足BST条件。
+思路2：用动态规划的方式做，拿到n个数字后，从中依次选取一个作为根结点。按照大小排列，分别可以获得左子树与右子树的数目。
+找到一个数作为根结点，剩余的数分别划入左子树或者右子树。
+
+
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<TreeNode*> generateTrees(int n) {
+        vector<TreeNode*> re;
+        if(n<=0) {
+            return re;
+        }
+        return solve(1,n);
+        //return re;
+    }
+    vector<TreeNode*> solve(int p,int r) {
+        vector<TreeNode*> tmp;
+        if(p>r) {
+            tmp.push_back(NULL);
+            return tmp;
+        }
+        else {
+            for(int i=p;i!=r+1;++i) {
+                vector<TreeNode*> left=solve(p,i-1);
+                vector<TreeNode*> right=solve(i+1,r);
+                for(int j=0;j!=left.size();++j) {
+                    for(int k=0;k!=right.size();++k) {
+                        TreeNode* p=new TreeNode(i);
+                        p->left=left[j];
+                        p->right=right[k];
+                        tmp.push_back(p);
+                    }
+                }
+            }
+            return tmp;
+        }
+    }
+};
