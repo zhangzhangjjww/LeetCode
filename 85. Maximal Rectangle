@@ -1,0 +1,119 @@
+Given a 2D binary matrix filled with 0's and 1's, find the largest rectangle containing only 1's and return its area.
+
+For example, given the following matrix:
+
+1 0 1 0 0
+1 0 1 1 1
+1 1 1 1 1
+1 0 0 1 0
+Return 6.
+
+
+思路同样是从第一行开始一行一行地处理，使[i, j]处最大子矩阵的面积是(right(i, j)-left(i, j))*height(i, j)。其中height统计当前位置及往上'1'的数量；left和right是高度是当前点的height值得左右边界，即是以当前点为中心，以height为高度向两边扩散的左右边界。
+
+递推公式如下：
+
+left(i, j) = max(left(i-1, j), cur_left);
+right(i, j) = min(right(i-1, j), cur_right);
+height(i, j) = height(i-1, j) + 1, if matrix[i][j]=='1';
+height(i, j) = 0, if matrix[i][j]=='0'.
+其中cur_left和cur_right的值由当前行决定，如果当前位置是'1'，则cur_left和cur_right都不变；如果当前位置是'0'，则cur_left就为当前位置的右侧，cur_right就为当前位置（因为左闭右开）。
+
+方法二：
+假设把矩阵沿着某一行分开，然后把分开的行作为底面，将自底面往上的矩阵看成一个直方图（histogram）。直方图的中每个项的高度就是从底面行开始往上1的数量。根据Largest Rectangle in Histogram就可以求出当前行作为矩阵下边缘的一个最大矩阵。接下来如果对每一行都做一次Largest Rectangle in Histogram，从其中选出最大的矩阵，那么它就是整个矩阵中面积最大的子矩阵。
+
+如何计算某一行为底面时直方图的高度呢？如果重新计算，那么每次需要的计算数量就是当前行数乘以列数。然而会发现一些动态规划的踪迹，如果知道上一行直方图的高度，就只需要看新加进来的行（底面）上对应的列元素是不是0，如果是，则高度是0，否则则是上一行直方图的高度加1。利用历史信息，就可以在线行时间内完成对高度的更新。由于Largest Rectangle in Histogram的算法复杂度是O(n)。所以完成对一行为底边的矩阵求解复杂度是O(n+n)=O(n)。接下来对每一行都做一次，那么算法总时间复杂度是O(m*n)。
+
+
+class Solution {
+public:
+    int maximalRectangle(vector<vector<char>>& matrix) {
+        if(matrix.empty()||matrix[0].empty()) {
+            return 0;
+        }
+        int m=matrix.size();
+        int n=matrix[0].size();
+        /*vector<int> left(n,0),right(n,n),height(n,0);
+        int re=0;
+        for(int i=0;i!=m;++i) {
+            int curr_left=0,curr_right=n;
+            for(int j=0;j!=n;++j) {
+                if(matrix[i][j]=='1') {
+                    height[j]++;
+                }
+                else {
+                    height[j]=0;
+                }
+                if(matrix[i][j]=='1') {
+                    left[j]=left[j]>curr_left?left[j]:curr_left;
+                }
+                else {
+                    left[j]=0;
+                    curr_left=j+1;
+                }
+            }
+            for(int j=n-1;j!=-1;--j) {
+                if(matrix[i][j]=='1') {
+                    right[j]=right[j]<curr_right?right[j]:curr_right;
+                }
+                else {
+                    right[j]=n;
+                    curr_right=j;
+                }
+            }
+            for(int j=0;j!=n;++j) {
+                int tmp=(right[j]-left[j])*height[j];
+                if(tmp>re) {
+                    re=tmp;
+                }
+            }
+        }
+        return re;*/
+        vector<int> height(n,0);
+        int re=0;
+        for(int i=0;i!=m;++i) {
+            for(int j=0;j!=n;++j) {
+                if(matrix[i][j]=='1') {
+                    ++height[j];
+                }
+                else {
+                    height[j]=0;
+                }
+            }
+            int tmp=0;
+            stack<int> high,pos;
+            for(int j=0;j!=n;++j) {
+                if(high.empty()||high.top()<=height[j]) {
+                    high.push(height[j]);
+                    pos.push(j);
+                }
+                else {
+                    int k;
+                    while(!high.empty()&&high.top()>=height[j]) {
+                        k=pos.top();
+                        int area=(j-k)*high.top();
+                        if(area>tmp) {
+                            tmp=area;
+                        }
+                        high.pop();
+                        pos.pop();
+                    }
+                    high.push(height[j]);
+                    pos.push(k);
+                }
+            }
+            while(!high.empty()) {
+                int area=(n-pos.top())*high.top();
+                high.pop();
+                pos.pop();
+                if(area>tmp) {
+                    tmp=area;
+                }
+            }
+            if(tmp>re) {
+                re=tmp;
+            }
+        }
+        return re;
+    }
+};
