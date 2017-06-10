@@ -1,0 +1,68 @@
+mplement an iterator over a binary search tree (BST). Your iterator will be initialized with the root node of a BST.
+
+Calling next() will return the next smallest number in the BST.
+
+Note: next() and hasNext() should run in average O(1) time and uses O(h) memory, where h is the height of the tree.
+
+
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class BSTIterator {
+private:
+    stack<int> s;
+public:
+    BSTIterator(TreeNode *root) {
+        map<TreeNode*,int> m;
+        stack<TreeNode*> tmp;
+        vector<int> v;
+        if(root!=NULL) {
+            tmp.push(root);
+            m[root]=1;
+            while(!tmp.empty()) {
+                TreeNode* p=tmp.top();
+                while(p->left!=NULL&&m.count(p->left)==0) {
+                    m[p->left]=1;
+                    tmp.push(p->left);
+                    p=p->left;
+                }
+                v.push_back(p->val);
+                tmp.pop();
+                if(p->right!=NULL&&m.count(p->right)==0) {
+                    m[p->right]=1;
+                    tmp.push(p->right);
+                }
+            }
+            for(int i=v.size()-1;i!=-1;--i) {
+                s.push(v[i]);
+            }
+        } 
+    }
+
+    /** @return whether we have a next smallest number */
+    bool hasNext() {
+        if(s.empty()) {
+            return false;
+        }
+        return true;
+    }
+
+    /** @return the next smallest number */
+    int next() {
+        int key=s.top();
+        s.pop();
+        return key;
+    }
+};
+
+/**
+ * Your BSTIterator will be called like this:
+ * BSTIterator i = BSTIterator(root);
+ * while (i.hasNext()) cout << i.next();
+ */
