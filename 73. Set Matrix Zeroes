@@ -1,0 +1,71 @@
+Given a m x n matrix, if an element is 0, set its entire row and column to 0. Do it in place.
+
+class Solution {
+public:
+    void setZeroes(vector<vector<int>>& matrix) {
+        if(matrix.empty()) {
+            return;
+        }
+        int pos;
+        int row_pos;
+        for(pos=0;pos!=matrix.size();++pos) {
+            int j=0;
+            for(;j!=matrix[0].size();++j) {
+                if(matrix[pos][j]==0) {
+                    break;
+                }
+            }
+            if(j==matrix[0].size()) {
+                row_pos=pos;
+                break;
+            }
+        }
+        if(pos==matrix.size()) {
+            for(int i=0;i!=matrix.size();++i) {
+                for(int j=0;j!=matrix[0].size();++j) {
+                    matrix[i][j]=0;
+                }
+            }
+            return;
+        }
+        bool exist=false;
+        for(int i=0;i<row_pos;++i) {
+            for(int j=0;j!=matrix[0].size();++j) {
+                if(matrix[i][j]==0) {
+                   // set(matrix,i,j);
+                    matrix[row_pos][j]=0;
+                    exist=true;
+                }
+            }
+            if(exist) {
+                set(matrix,i);
+            }
+            exist=false;
+        }
+        for(int i=row_pos+1;i<matrix.size();++i) {
+            for(int j=0;j!=matrix[0].size();++j) {
+                if(matrix[i][j]==0) {
+                   // set(matrix,i,j);
+                    matrix[row_pos][j]=0;
+                    exist=true;
+                }
+            }
+            if(exist) {
+                set(matrix,i);
+            }
+            exist=false;
+        }
+        for(int j=0;j!=matrix[0].size();++j) {
+            if(matrix[row_pos][j]==0) {
+                for(int i=0;i!=matrix.size();++i) {
+                    matrix[i][j]=0;
+                }
+            }
+        }
+    }
+    void set(vector<vector<int>>& ma,int i) {
+        for(int k=0;k!=ma[i].size();++k) {
+            ma[i][k]=0;
+        }
+    }
+};
