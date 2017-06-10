@@ -1,0 +1,64 @@
+Given a non-empty string s and a dictionary wordDict containing a list of non-empty words, add spaces in s to construct a sentence where each word is a valid dictionary word. You may assume the dictionary does not contain duplicate words.
+
+Return all such possible sentences.
+
+For example, given
+s = "catsanddog",
+dict = ["cat", "cats", "and", "sand", "dog"].
+
+A solution is ["cats and dog", "cat sand dog"].
+
+
+
+class Solution {
+public:
+    vector<string> wordBreak(string s, vector<string>& wordDict) {
+        vector<string> res;
+        if(s.size()==0&&wordDict.size()==0) {
+            return res;
+        }
+        if(s.size()==0&&wordDict.size()!=0) {
+            return res;
+        }
+        if(s.size()!=0&&wordDict.size()==0) {
+            return res;
+        }
+        map<string,int> m;
+        for(int i=0;i!=wordDict.size();++i) {
+            m[wordDict[i]]=1;
+        }
+        map<string,vector<string>> mm;
+        res=solve(mm,s,m);
+        return res;
+        
+    }
+    vector<string> solve(map<string,vector<string>>& mm,string s,map<string,int>& m) {
+        if(mm.count(s)) {
+            return mm[s];
+        }
+        vector<string> re;
+        if(m.count(s)) {
+            re.push_back(s);
+        }
+        for(int i=1;i<s.size();++i) {
+            string tmp=sub(s,i,s.size()-1);
+            if(m.count(tmp)) {
+                string rem=sub(s,0,i-1);
+                vector<string> pre=solve(mm,rem,m);
+                for(int j=0;j<pre.size();++j) {
+                    pre[j]+=" "+tmp;
+                }
+                re.insert(re.end(),pre.begin(), pre.end());
+            }
+        }
+        mm[s]=re;
+        return re;
+    }
+    string sub(string& s,int beg,int end) {
+        string ss;
+        for(int i=beg;i<end+1;++i) {
+            ss+=s[i];
+        }
+        return ss;
+    }
+};
