@@ -1,0 +1,97 @@
+The gray code is a binary numeral system where two successive values differ in only one bit.
+
+Given a non-negative integer n representing the total number of bits in the code, print the sequence of gray code. A gray code sequence must begin with 0.
+
+For example, given n = 2, return [0,1,3,2]. Its gray code sequence is:
+
+00 - 0
+01 - 1
+11 - 3
+10 - 2
+Note:
+For a given n, a gray code sequence is not uniquely defined.
+
+For example, [0,2,3,1] is also a valid gray code sequence according to the above definition.
+
+For now, the judge is able to judge based on one instance of gray code sequence. Sorry about that.
+
+
+class Solution {
+public:
+    vector<int> grayCode(int n) {
+        vector<int> re;
+        if(n==0) {
+            re.push_back(0);
+            return re;
+        }
+        re.push_back(0);
+        string s;
+        for(int i=0;i!=n;++i) {
+            s+='0';
+        }
+        int sum=exponent(2,n);
+        cout<<sum<<endl;
+        solve(re,s,sum-1);
+        return re;
+    }
+    int exponent(int base,int pow) {
+        int sum=1;
+        for(int i=0;i!=pow;++i) {
+            sum*=base;
+        }
+        return sum;
+    }
+    void solve(vector<int>& re,string s,int sum) {
+        if(sum==0) {
+            return;
+        }
+        else {
+            //cout<<s<<endl; 
+            for(int i=s.size()-1;i!=-1;--i) {
+                if(s[i]=='0') {
+                    s[i]='1';
+                    if(search(re,s)) {
+                        //cout<<s<<endl;
+                        re.push_back(convert(s));
+                        solve(re,s,sum-1);
+                        break;
+                    }
+                    else {
+                        s[i]='0';
+                    }
+                }
+                else {
+                    s[i]='0';
+                    if(search(re,s)) {
+                        re.push_back(convert(s));
+                        solve(re,s,sum-1);
+                        break;
+                    }
+                    else {
+                        s[i]='1';
+                    }
+                }
+            }
+        }
+    }
+    bool search(vector<int>& vol,string s) {
+        if(vol.empty()) {
+            return true;
+        }
+        for(int i=0;i!=vol.size();++i) {
+            if(vol[i]==convert(s)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    int convert(string s) {
+        int sum=0;
+        int count=0;
+        for(int i=s.size()-1;i!=-1;--i) {
+            sum=sum+(s[i]-'0')*exponent(2,count);
+            ++count;
+        }
+        return sum;
+    }
+};
