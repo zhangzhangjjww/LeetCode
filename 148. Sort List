@@ -1,0 +1,92 @@
+Sort a linked list in O(n log n) time using constant space complexity.
+
+
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        if(head==NULL) {
+            return NULL;
+        }
+        ListNode* p=head,*pre=NULL;
+        int count=0;
+        while(p) {
+            pre=p;
+            p=p->next;
+            ++count;
+        }
+        p=solve(head,count);
+        return p;
+    }
+    ListNode* solve(ListNode* p,int n) {
+        if(n==1) {
+            return p;
+        }
+        else {
+            int i=0;
+            ListNode* tmp=p,*pre=NULL;
+            while(i<n/2) {
+                ++i;
+                pre=tmp;
+                tmp=tmp->next;
+            }
+            pre->next=NULL;
+            //cout<<tmp->val<<endl;
+            //merge(p,tmp);
+            ListNode* k1=solve(p,n/2);
+            ListNode* k2=solve(tmp,n-n/2);
+            merge(k1,k2);
+            if(k1->val>k2->val) {
+                return k2;
+            }
+            else {
+                return k1;
+            }
+            return p;
+        }
+    }
+    void merge(ListNode* p1,ListNode* p2) {
+        ListNode* p=NULL;
+        while(p1&&p2) {
+            if(p1->val<=p2->val) {
+                if(p==NULL) {
+                    p=p1;
+                }
+                else {
+                    p->next=p1;
+                    p=p->next;
+                }
+                p1=p1->next;
+            }
+            else {
+                if(p==NULL) {
+                    p=p2;
+                }
+                else {
+                    p->next=p2;
+                    p=p->next;
+                }
+                p2=p2->next;
+            }
+        }
+        while(p1&&p2==NULL) {
+            p->next=p1;
+            p1=p1->next;
+            p=p->next;
+        }
+        while(p1==NULL&&p2) {
+            p->next=p2;
+            p2=p2->next;
+            p=p->next;
+        }
+        
+    }
+};
