@@ -1,0 +1,37 @@
+Given an array of integers, every element appears twice except for one. Find that single one.
+
+Note:
+Your algorithm should have a linear runtime complexity. Could you implement it without using extra memory?
+
+
+
+没想出O(n)的算法，于是只好看了下Discuss，发现了一个很有意思的解决方式：利用XOR运算，原文地址:https://oj.leetcode.com/discuss/6170/my-o-n-solution-using-xor
+
+因为A XOR A = 0，且XOR运算是可交换的，于是，对于实例{2,1,4,5,2,4,1}就会有这样的结果：
+
+(2^1^4^5^2^4^1) => ((2^2)^(1^1)^(4^4)^(5)) => (0^0^0^5) => 5
+就把只出现了一次的元素(其余元素均出现两次)给找出来了！
+
+
+
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        map<int,int> m;
+        for(int i=0;i!=nums.size();++i) {
+            if(m.count(nums[i])==0) {
+                m[nums[i]]=1;
+            }
+            else {
+                ++m[nums[i]];
+            }
+        }
+        int re;
+        for(map<int,int>::iterator i=m.begin();i!=m.end();++i) {
+            if(i->second==1) {
+                re=i->first;
+            }
+        }
+        return re;
+    }
+};
