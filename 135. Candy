@@ -1,0 +1,59 @@
+here are N children standing in a line. Each child is assigned a rating value.
+
+You are giving candies to these children subjected to the following requirements:
+
+Each child must have at least one candy.
+Children with a higher rating get more candies than their neighbors.
+What is the minimum candies you must give?
+
+
+
+class Solution {
+public:
+    int candy(vector<int>& ratings) {
+        if(ratings.size()==0) {
+            return 0;
+        }
+        int* count=new int[ratings.size()];
+        for(int i=0;i!=ratings.size();++i) {
+            count[i]=0;
+        }
+        int sum=0;
+        int tmp=1;
+        count[0]=1;
+        int pos=0;
+        for(int i=1;i!=ratings.size();++i) {
+            if(ratings[i]>ratings[i-1]) {
+                tmp++;
+                count[i]=tmp;
+            }
+            else {
+                if(ratings[i]==ratings[i-1]) {
+                    tmp=1;
+                    count[i]=tmp;
+                    pos=i;
+                }
+                else {
+                    tmp=1;
+                    count[i]=tmp;
+                    if(count[i-1]==1) {
+                        for(int j=i-1;j>pos-1;--j) {
+                            ++count[j];
+                        }
+                        if(pos>1&&count[pos-1]<=count[pos]&&ratings[pos]<ratings[pos-1]) {
+                            count[pos-1]=count[pos]+1;
+                        }
+                    }
+                    else {
+                        pos=i;
+                    }
+                }
+            }
+        }
+        for(int i=0;i!=ratings.size();++i) {
+            sum+=count[i];
+        }
+        delete [] count;
+        return sum;
+    }
+};
