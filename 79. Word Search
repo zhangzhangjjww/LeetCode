@@ -44,3 +44,4 @@ public:
     	board[x][y]=t;
         return false;
     }
+}；
