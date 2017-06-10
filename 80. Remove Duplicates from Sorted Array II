@@ -1,0 +1,63 @@
+Follow up for "Remove Duplicates":
+What if duplicates are allowed at most twice?
+
+For example,
+Given sorted array nums = [1,1,1,2,2,3],
+
+Your function should return length = 5, with the first five elements of nums being 1, 1, 2, 2 and 3. It doesn't matter what you leave beyond the new length.
+
+
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+        if(nums.empty()) {
+            return 0;
+        }
+        int length=1;
+        int element=1;
+        int sz=nums.size();
+        int i=1;
+        int curr=nums[0];
+        while(i<sz) {
+            if(nums[i]==curr) {
+                if(element==2) {
+                    fix(nums,i);
+                    --sz;
+                    while(i<sz&&curr==nums[i]) {
+                        fix(nums,i);
+                        --sz;
+                    }
+                    if(i<sz) {
+                        curr=nums[i];
+                        ++length;
+                        element=1;
+                        ++i;
+                    }
+                }
+                else {
+                    ++length;
+                    ++element;
+                    ++i;
+                }
+            }
+            else {
+                curr=nums[i];
+                element=1;
+                ++length;
+                ++i;
+            }
+            //for(int j=0;j!=nums.size();++j) {
+           //     cout<<nums[j];
+           // }
+           // cout<<endl;
+           // cout<<length<<endl;
+        }
+        return length;
+    }
+    void fix(vector<int>& v,int s) {
+        for(int i=s;i<v.size()-1;++i) {
+            v[i]=v[i+1];
+            //cout<<s<<" "<<v[s]<<" "<<s+1<<" "<<v[s+1]<<endl;
+        }
+    }
+};
