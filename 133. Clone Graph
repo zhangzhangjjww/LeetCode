@@ -1,0 +1,64 @@
+Clone an undirected graph. Each node in the graph contains a label and a list of its neighbors.
+
+
+OJ's undirected graph serialization:
+Nodes are labeled uniquely.
+
+We use # as a separator for each node, and , as a separator for node label and each neighbor of the node.
+As an example, consider the serialized graph {0,1,2#1,2#2,2}.
+
+The graph has a total of three nodes, and therefore contains three parts as separated by #.
+
+First node is labeled as 0. Connect node 0 to both nodes 1 and 2.
+Second node is labeled as 1. Connect node 1 to node 2.
+Third node is labeled as 2. Connect node 2 to node 2 (itself), thus forming a self-cycle.
+Visually, the graph looks like the following:
+
+       1
+      / \
+     /   \
+    0 --- 2
+         / \
+         \_/
+         
+         
+         /**
+ * Definition for undirected graph.
+ * struct UndirectedGraphNode {
+ *     int label;
+ *     vector<UndirectedGraphNode *> neighbors;
+ *     UndirectedGraphNode(int x) : label(x) {};
+ * };
+ */
+class Solution {
+public:
+    UndirectedGraphNode *cloneGraph(UndirectedGraphNode *node) {
+        if(node==NULL) {
+            return NULL;
+        }
+        map<int,UndirectedGraphNode*> m;
+        map<int,int> m2;
+        UndirectedGraphNode* p=new UndirectedGraphNode(node->label);
+        m[p->label]=p;
+        dfs(m2,m,p,node);
+        return p;
+    }
+    void dfs(map<int,int>& m,map<int,UndirectedGraphNode*>& vol,UndirectedGraphNode* p,UndirectedGraphNode* node) {
+         if(m.count(p->label)==0) {
+             m[p->label]=1;
+             for(int i=0;i!=node->neighbors.size();++i) {
+                 UndirectedGraphNode* tmp=NULL;
+                 if(vol.count(node->neighbors[i]->label)==0) {
+                     tmp=new UndirectedGraphNode(node->neighbors[i]->label);
+                     vol[node->neighbors[i]->label]=tmp;
+                 }
+                 else {
+                     tmp=vol[node->neighbors[i]->label];
+                 }
+                 p->neighbors.push_back(tmp);
+                 dfs(m,vol,tmp,node->neighbors[i]);
+              }
+         }
+                   
+    }
+};
