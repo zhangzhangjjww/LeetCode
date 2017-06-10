@@ -1,0 +1,75 @@
+Given a binary tree, find the maximum path sum.
+
+For this problem, a path is defined as any sequence of nodes from some starting node to any node in the tree along the parent-child connections. The path must contain at least one node and does not need to go through the root.
+
+For example:
+Given the below binary tree,
+
+       1
+      / \
+     2   3
+Return 6.
+
+
+复杂度
+时间 O(b^(h+1)-1) 空间 O(h) 递归栈空间 对于二叉树b=2
+
+思路
+首先我们分析一下对于指定某个节点为根时，最大的路径和有可能是哪些情况。第一种是左子树的路径加上当前节点，第二种是右子树的路径加上当前节点，第三种是左右子树的路径加上当前节点（相当于一条横跨当前节点的路径），第四种是只有自己的路径。乍一看似乎以此为条件进行自下而上递归就行了，然而这四种情况只是用来计算以当前节点根的最大路径，如果当前节点上面还有节点，那它的父节点是不能累加第三种情况的。所以我们要计算两个最大值，一个是当前节点下最大路径和，另一个是如果要连接父节点时最大的路径和。我们用前者更新全局最大量，用后者返回递归值就行了。
+
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    int maxPathSum(TreeNode* root) {
+        if(root==NULL) {
+            return 0;
+        }
+        int max=numeric_limits<int>::min();
+        solve(root,max);
+        return max;
+    }
+    int solve(TreeNode* p,int& max) {
+        if(p==NULL) {
+            return 0;
+        }
+        else {
+            int l=solve(p->left,max);
+            int r=solve(p->right,max);
+            int key1=l+r+p->val;
+            int key2=l+p->val;
+            int key3=r+p->val;
+            int tmp;
+            if(key1>key2) {
+                tmp=key1;
+            }
+            else {
+                tmp=key2;
+            }
+            if(key3> tmp) {
+                tmp=key3;
+            }
+            if(p->val>tmp) {
+                tmp=p->val;
+            }
+            if(tmp>max) {
+                max=tmp;
+            }
+            int some=l>r?l+p->val:r+p->val;
+            if(p->val> some) {
+                return p->val;
+            }
+            else {
+                return some;
+            }
+        }
+    }
+};
