@@ -1,0 +1,92 @@
+Design a stack that supports push, pop, top, and retrieving the minimum element in constant time.
+
+push(x) -- Push element x onto stack.
+pop() -- Removes the element on top of the stack.
+top() -- Get the top element.
+getMin() -- Retrieve the minimum element in the stack.
+Example:
+MinStack minStack = new MinStack();
+minStack.push(-2);
+minStack.push(0);
+minStack.push(-3);
+minStack.getMin();   --> Returns -3.
+minStack.pop();
+minStack.top();      --> Returns 0.
+minStack.getMin();   --> Returns -2.
+
+
+class MinStack {
+private:
+    vector<int> v;
+    vector<int> min;
+    int size;
+public:
+    /** initialize your data structure here. */
+    MinStack() {
+        size=0;
+    }
+    
+    void push(int x) {
+        if(v.empty()) {
+            v.push_back(x);
+            min.push_back(x);
+            ++size;
+        }
+        else {
+            if(size==v.size()) {
+                v.push_back(x);
+                ++size;
+                if(x<min[size-2]) {
+                    min.push_back(x);
+                }
+                else {
+                    min.push_back(min[size-2]);
+                }
+            }
+            else {
+                ++size;
+                v[size-1]=x;
+                if(size>1) {
+                    if(x<min[size-2]) {
+                        min[size-1]=x;
+                    }
+                    else {
+                        min[size-1]=min[size-2];
+                    }
+                }
+                else {
+                    min[0]=x;
+                }
+            }
+        }
+    }
+    
+    void pop() {
+        if(size>0) {
+            --size;
+        }
+    }
+    
+    int top() {
+        if(size>0) {
+            return v[size-1];
+        }
+        return 0;
+    }
+    
+    int getMin() {
+        if(size>0) {
+            return min[size-1];
+        }
+        return 0;
+    }
+};
+
+/**
+ * Your MinStack object will be instantiated and called as such:
+ * MinStack obj = new MinStack();
+ * obj.push(x);
+ * obj.pop();
+ * int param_3 = obj.top();
+ * int param_4 = obj.getMin();
+ */
