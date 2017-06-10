@@ -1,0 +1,85 @@
+Given an unsorted array, find the maximum difference between the successive elements in its sorted form.
+
+Try to solve it in linear time/space.
+
+Return 0 if the array contains less than 2 elements.
+
+You may assume all elements in the array are non-negative integers and fit in the 32-bit signed integer range.
+
+
+class Solution {
+public:
+    int maximumGap(vector<int>& nums) {
+        if(nums.size()<2) {
+            return 0;
+        }
+        radix_sort(nums,32);
+        int re=0;
+        for(int i=1;i!=nums.size();++i) {
+            if(nums[i]-nums[i-1]>re) {
+                re=nums[i]-nums[i-1];
+            }
+        }
+        return re;
+    }
+    void radix_sort(vector<int>& nums,int d) {
+        vector<string> bit;
+        for(int i=0;i!=nums.size();++i) {
+            bit.push_back(change(nums[i]));
+        }
+        for(int i=0;i!=d;++i) {
+            count_sort(nums,bit,31-i);
+        }
+    }
+    void count_sort(vector<int>& nums,vector<string>& bit,int pos) {
+        int* tmp=new int[nums.size()];
+        string* vol=new string[bit.size()];
+        for(int i=0;i!=nums.size();++i) {
+            tmp[i]=0;
+        }
+        int a=0,b=0;
+        for(int i=0;i!=bit.size();++i) {
+            if(bit[i][pos]=='0') {
+                ++a;
+            }
+            else {
+                ++b;
+            }
+        }
+        b=b+a;
+        for(int i=nums.size()-1;i!=-1;--i) {
+            if(bit[i][pos]=='1') {
+                tmp[b-1]=nums[i];
+                vol[b-1]=bit[i];
+                --b;
+            }
+            else {
+                tmp[a-1]=nums[i];
+                vol[a-1]=bit[i];
+                --a;
+            }
+        }
+        for(int i=0;i!=nums.size();++i) {
+            nums[i]=tmp[i];
+            bit[i]=vol[i];
+        }
+        delete [] tmp;
+        delete [] vol;
+    }
+    string change(int n) {
+        string s(32,'0');
+        if(n==0) {
+            return s;
+        }
+        string tmp;
+        while(n!=0) {
+            int key=n%2;
+            n=n/2;
+            tmp+=char('0'+key);
+        }
+        for(int i=0;i!=tmp.size();++i) {
+            s[31-i]=tmp[i];
+        }
+        return s;
+    }
+};
