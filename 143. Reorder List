@@ -1,0 +1,80 @@
+Given a singly linked list L: L0→L1→…→Ln-1→Ln,
+reorder it to: L0→Ln→L1→Ln-1→L2→Ln-2→…
+
+You must do this in-place without altering the nodes' values.
+
+For example,
+Given {1,2,3,4}, reorder it to {1,4,2,3}.
+
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    void reorderList(ListNode* head) {
+        if(head==NULL) {
+            return;
+        }
+        ListNode* p=head;
+        int count=0;
+        while(p) {
+            ++count;
+            p=p->next;
+        }
+        if(count<=2) {
+            return;
+        }
+        int mid;
+        if(count%2==0) {
+            mid=count/2;
+        }
+        else {
+            mid=(count+1)/2;
+        }
+        p=head;
+        ListNode* pre=NULL;
+        int i=0;
+        while(i!=mid) {
+            ++i;
+            pre=p;
+            p=p->next;
+        }
+        ListNode* key=pre;
+        while(p) {
+            ListNode* tmp=p->next;
+            p->next=pre;
+            pre=p;
+            p=tmp;
+        }
+        ListNode* end=pre,*beg=head;
+        i=0;
+        while(i<mid) {
+            ListNode* tmp1=beg->next;
+            ListNode* tmp2=end->next;
+            beg->next=end;
+            if(tmp1!=key) {
+                end->next=tmp1;
+            }
+            else {
+                if(count%2==0) {
+                    end->next=tmp1;
+                    tmp2->next=NULL;
+                    return;
+                }
+                else {
+                    end->next=tmp1;
+                    tmp1->next=NULL;
+                }
+            }
+            beg=tmp1;
+            end=tmp2;
+            ++i;
+        }
+    }
+};
