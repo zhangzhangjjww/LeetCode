@@ -1,0 +1,36 @@
+Given an array with n objects colored red, white or blue, sort them so that objects of the same color are adjacent, with the colors in the order red, white and blue.
+
+Here, we will use the integers 0, 1, and 2 to represent the color red, white, and blue respectively.
+
+Note:
+You are not suppose to use the library's sort function for this problem.
+
+class Solution {
+public:
+    void sortColors(vector<int>& nums) {
+        if(nums.empty()) {
+            return;
+        }
+        count_sort(nums);
+    }
+    void count_sort(vector<int>& nums) {
+        int re[3];
+        const int k=3;
+        for(int i=0;i!=k;++i) {
+            re[i]=0;
+        }
+        for(int i=0;i!=nums.size();++i) {
+            re[nums[i]]=re[nums[i]]+1;
+        }
+        for(int i=1;i!=k;++i) {
+            re[i]=re[i]+re[i-1];
+        }
+        vector<int> tmp=nums;
+        for(int i=nums.size()-1;i>-1;--i) {
+            int key=nums[i];
+            tmp[re[key]-1]=key;
+            --re[nums[i]];
+        }
+        nums=tmp;
+    }
+};
