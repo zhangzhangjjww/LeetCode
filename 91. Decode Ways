@@ -1,0 +1,105 @@
+A message containing letters from A-Z is being encoded to numbers using the following mapping:
+
+'A' -> 1
+'B' -> 2
+...
+'Z' -> 26
+Given an encoded message containing digits, determine the total number of ways to decode it.
+
+For example,
+Given encoded message "12", it could be decoded as "AB" (1 2) or "L" (12).
+
+The number of ways decoding "12" is 2.
+
+
+class Solution {
+public:
+    int numDecodings(string s) {
+        if(s.empty()) {
+            return 0;
+        }
+        if(s.size()==1) {
+            if(s[0]!='0') {
+                return 1;
+            }
+            else {
+                return 0;
+            }
+        }
+        int* re=new int[s.size()];
+        for(int i=0;i!=s.size();++i) {
+            re[i]=0;
+        }
+        if(s[0]=='0') {
+            delete [] re;
+            return 0;
+        }
+        else {
+            int tmp=(s[0]-'0')*10+s[1]-'0';
+            cout<<tmp<<endl;
+            if(tmp>0&&tmp<=26) {
+                if(s[1]=='0') {
+                    re[0]=1;
+                    re[1]=1;
+                }
+                else {
+                    re[0]=1;
+                    re[1]=2;
+                }
+            }
+            else {
+                if(s[1]=='0') {
+                    delete [] re;
+                    return 0;
+                }
+                else {
+                    re[0]=1;
+                    re[1]=1;
+                }
+            }
+        }
+        int i=2;
+        int sum=0;
+        while(i<s.size()) {
+            int key1=s[i]-'0';
+            int key2=s[i-1]-'0';
+            if(key1==0||key2==0) {
+                if(key2==0&&key1!=0) {
+                    re[i]=re[i-2];
+                }
+                else {
+                    if(key1==0&&key2==0) {
+                        break;
+                    }
+                    else {
+                        int tmp=key2*10;
+                        if(tmp>0&&tmp<26) {
+                            re[i]=re[i-2];
+                        }
+                        else {
+                            break;
+                        }
+                    }
+                }
+            }
+            else {
+                int tmp=(s[i-1]-'0')*10+s[i]-'0';
+                if(tmp>0&&tmp<=26) {
+                    re[i]=re[i-1]+re[i-2];
+                }
+                else {
+                    re[i]=re[i-1];
+                }
+            }
+            ++i;
+        }
+        sum=re[s.size()-1];
+        delete [] re;
+        if(i!=s.size()) {
+            return 0;
+        }
+        else {
+            return sum;
+        }
+    }
+};
