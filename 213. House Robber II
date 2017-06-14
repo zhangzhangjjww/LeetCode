@@ -1,0 +1,69 @@
+Note: This is an extension of House Robber.
+
+After robbing those houses on that street, the thief has found himself a new place for his thievery so that he will not get too much attention. This time, all houses at this place are arranged in a circle. That means the first house is the neighbor of the last one. Meanwhile, the security system for these houses remain the same as for those in the previous street.
+
+Given a list of non-negative integers representing the amount of money of each house, determine the maximum amount of money you can rob tonight without alerting the police.
+
+
+
+
+
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+        int n=nums.size();
+        if(n==0) {
+            return 0;
+        }
+        if(n==1) {
+            return nums[0];
+        }
+        if(n==2) {
+            return nums[0]>nums[1]?nums[0]:nums[1];
+        }
+        vector<int> v1;
+        for(int i=0;i!=nums.size()-1;++i) {
+            v1.push_back(nums[i]);
+        }
+        vector<int> v2;
+        for(int i=1;i!=nums.size();++i) {
+            v2.push_back(nums[i]);
+        }
+        int key1=solve(v1);
+        int key2=solve(v2);
+        return key1>key2?key1:key2;
+    }
+    int solve(vector<int>& nums) {
+        int n=nums.size();
+        if(n==0) {
+            return 0;
+        }
+        if(n==1) {
+            return nums[0];
+        }
+        if(n==2) {
+            return nums[0]>nums[1]?nums[0]:nums[1];
+        }
+        int* re=new int[n];
+        for(int i=0;i!=n;++i) {
+            re[i]=0;
+        }
+        re[0]=nums[0];
+        re[1]=nums[1];
+        for(int i=2;i!=n;++i) {
+            for(int j=0;j<i-1;++j) {
+                if(re[j]+nums[i]>re[i]) {
+                    re[i]=re[j]+nums[i];
+                }
+            }
+        }
+        int sum=0;
+        for(int i=0;i!=n;++i) {
+            if(sum<re[i]) {
+                sum=re[i];
+            }
+        }
+        delete [] re;
+        return sum;
+    }
+};
