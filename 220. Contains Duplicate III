@@ -1,0 +1,31 @@
+Given an array of integers, find out whether there are two distinct indices i and j in the array such that the absolute difference between nums[i] and nums[j] is at most t and the absolute difference between i and j is at most k.
+
+
+class Solution {
+public:
+    bool containsNearbyAlmostDuplicate(vector<int>& nums, int k, int t) {
+        if(nums.size()==0) {
+            return false;
+        }
+        if(k<=0) {
+            return false;
+        }
+        vector<pair<long,int>> v;
+        for(int i=0;i!=nums.size();++i) {
+            v.push_back(make_pair(nums[i],i));
+        }
+        sort(v.begin(),v.end());
+        for(int i=0;i!=v.size();++i) {
+            int j=i+1;
+            while(j<v.size()&&abs(v[j].first-v[i].first)<=t) {
+                if(abs(v[i].second-v[j].second)<=k) {
+                    return true;
+                }
+                else {
+                    ++j;
+                }
+            }
+        }
+        return false;
+    }
+};
