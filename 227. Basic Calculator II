@@ -1,0 +1,115 @@
+Implement a basic calculator to evaluate a simple expression string.
+
+The expression string contains only non-negative integers, +, -, *, / operators and empty spaces . The integer division should truncate toward zero.
+
+You may assume that the given expression is always valid.
+
+Some examples:
+"3+2*2" = 7
+" 3/2 " = 1
+" 3+5 / 2 " = 5
+Note: Do not use the eval built-in library function.
+
+
+class Solution {
+public:
+    int calculate(string s) {
+        if(s.size()==0) {
+            return 0;
+        }
+        stack<string> operation;
+        stack<string> express;
+        for(int i=0;i<s.size();++i) {
+            if(s[i]==' ') {
+                continue;
+            }
+            else {
+                if(s[i]=='+'||s[i]=='-') {
+                    string ss;
+                    ss+=s[i];
+                    if(operation.size()==0) {
+                        operation.push(ss);
+                    }
+                    else {
+                        while(operation.size()!=0&&(operation.top()=="+"||operation.top()=="-"||operation.top()=="/"||operation.top()=="*")){
+                            express.push(operation.top());
+                            operation.pop();
+                        }
+                        operation.push(ss);
+                    }
+                }
+                else {
+                    if(s[i]=='*'||s[i]=='/') {
+                        string ss;
+                        ss+=s[i];
+                        if(operation.size()==0) {
+                            operation.push(ss);
+                        }
+                        else {
+                            while(operation.size()!=0&&(operation.top()=="*"||operation.top()=="/")) {
+                                express.push(operation.top());
+                                operation.pop();
+                            }
+                            operation.push(ss);
+                        }
+                    }
+                    else {
+                        string ss;
+                        while(i<s.size()&&s[i]>='0'&&s[i]<='9') {
+                            ss+=s[i];
+                            ++i;
+                        }
+                        express.push(ss);
+                        --i;
+                    }
+                }
+            }
+        }
+        while(operation.size()!=0) {
+            express.push(operation.top());
+            operation.pop();
+        }
+        vector<string> tmp;
+        while(express.size()!=0) {
+            tmp.push_back(express.top());
+            express.pop();
+        }
+        for(int i=0,j=tmp.size()-1;i<j;++i,--j) {
+            string c=tmp[i];
+            tmp[i]=tmp[j];
+            tmp[j]=c;
+        }
+        return solve(tmp);
+    }
+    int solve(vector<string>& tmp) {
+        stack<int> s;
+        for(int i=0;i!=tmp.size();++i) {
+            if(tmp[i][0]>='0'&&tmp[i][0]<='9') {
+                int re=0;
+                for(int j=0;j!=tmp[i].size();++j) {
+                    re=re*10+tmp[i][j]-'0';
+                }
+                s.push(re);
+            }
+            else {
+                int a=s.top();
+                s.pop();
+                int b=s.top();
+                s.pop();
+                if(tmp[i]=="+") {
+                    s.push(a+b);
+                }
+                if(tmp[i]=="-") {
+                    s.push(b-a);
+                }
+                if(tmp[i]=="*") {
+                    s.push(b*a);
+                }
+                if(tmp[i]=="/") {
+                    s.push(b/a);
+                }
+            }
+        }
+        return s.top();
+    }
+};
