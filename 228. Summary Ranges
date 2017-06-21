@@ -1,0 +1,72 @@
+Given a sorted integer array without duplicates, return the summary of its ranges.
+
+For example, given [0,1,2,4,5,7], return ["0->2","4->5","7"].
+
+
+class Solution {
+public:
+    vector<string> summaryRanges(vector<int>& nums) {
+        vector<string> re;
+        if(nums.size()==0) {
+            return re;
+        }
+        if(nums.size()==1) {
+            string s=convert(nums[0]);
+            re.push_back(s);
+            return re;
+        }
+        int pos=nums[0];
+        int start=nums[0];
+        for(int i=1;i<nums.size();++i) {
+            if(nums[i]==pos+1) {
+                pos=nums[i];
+            }
+            else {
+                insert(re,start,pos);
+                start=nums[i];
+                pos=nums[i];
+            }
+        }
+        insert(re,start,pos);
+        return re;
+    }
+    void insert(vector<string>& re,int start,int end) {
+        if(start==end) {
+            re.push_back(convert(start));
+        }
+        else {
+            string ss;
+            ss=convert(start)+"->"+convert(end);
+            re.push_back(ss);
+        }
+    }
+    string convert(int n) {
+        string s;
+        int label=1;
+        if(n==numeric_limits<int>::min()) {
+            s+="-2147483648";
+            return s;
+        }
+        if(n<0) {
+            label=-1;
+            n=n*-1;
+        }
+        if(n==0) {
+            s+='0';
+            return s;
+        }
+        while(n!=0) {
+            s+=char(n%10+'0');
+            n=n/10;
+        }
+        for(int i=0,j=s.size()-1;i<j;++i,--j) {
+            char c=s[i];
+            s[i]=s[j];
+            s[j]=c;
+        }
+        if(label==-1) {
+            s="-"+s;
+        }
+        return s;
+    }
+};
