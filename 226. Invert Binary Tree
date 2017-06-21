@@ -1,0 +1,44 @@
+nvert a binary tree.
+
+     4
+   /   \
+  2     7
+ / \   / \
+1   3 6   9
+to
+     4
+   /   \
+  7     2
+ / \   / \
+9   6 3   1
+
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* invertTree(TreeNode* root) {
+        if(root==NULL) {
+            return NULL;
+        }
+        root=solve(root);
+        return root;
+    }
+    TreeNode* solve(TreeNode* p) {
+        if(p==NULL) {
+            return p;
+        }
+        TreeNode* l=solve(p->left);
+        TreeNode* r=solve(p->right);
+        p->left=r;
+        p->right=l;
+        return p;
+    }
+};
