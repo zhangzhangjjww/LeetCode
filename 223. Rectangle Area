@@ -1,0 +1,93 @@
+Find the total area covered by two rectilinear rectangles in a 2D plane.
+
+Each rectangle is defined by its bottom left corner and top right corner as shown in the figure.
+
+Rectangle Area
+Assume that the total area is never beyond the maximum possible value of int.
+
+
+class Solution {
+public:
+    int computeArea(int A, int B, int C, int D, int E, int F, int G, int H) {
+        int left1,left2,right1,right2,up1,up2,down1,down2;
+        if(A<=E) {
+            left1=A;
+            down1=B;
+            right1=C;
+            up1=D;
+            left2=E;
+            down2=F;
+            right2=G;
+            up2=H;
+        }
+        else {
+            left1=E;
+            down1=F;
+            right1=G;
+            up1=H;
+            left2=A;
+            down2=B;
+            right2=C;
+            up2=D;
+        }
+        return overlap(left1,down1,right1,up1,left2,down2,right2,up2);
+    }
+    int overlap(int A, int B, int C, int D, int E, int F, int G, int H) {
+        if(C<=E) {   //左右不重叠
+            cout<<1<<endl;
+            return (D-B)*(C-A)+(H-F)*(G-E);
+        }
+        else {
+            if(B>=H||D<=F) {  //上下不重叠
+                cout<<2<<endl;
+                return (D-B)*(C-A)+(H-F)*(G-E);
+            }
+            else {
+                if(C>=G) {   //左右方向包含
+                    if(F<=B&&D<=H) {  //上下方向包含
+                        cout<<3<<endl;
+                        return (D-B)*(C-A)+(H-F)*(G-E)-(G-E)*(D-B);
+                    }
+                    else {
+                        if(H<=D&&F>=B) {
+                            cout<<4<<endl;
+                            return (D-B)*(C-A)+(H-F)*(G-E)-(G-E)*(H-F);
+                        }
+                        else {
+                            if(F>B&&F<D&&H>D) {  //上下方向交叉
+                                cout<<5<<endl;
+                                return (D-B)*(C-A)+(H-F)*(G-E)-(G-E)*(D-F);
+                            }
+                            else {
+                                cout<<6<<endl;
+                                return (D-B)*(C-A)+(H-F)*(G-E)-(G-E)*(H-B);
+                            }
+                        }
+                    }
+                }
+                else {  //左右方向交叉
+                    if(F<=B&&D<=H) {
+                        cout<<7<<endl;
+                        return (D-B)*(C-A)+(H-F)*(G-E)-(C-E)*(D-B);
+                    }
+                    else {
+                        if(H<=D&&F>=B) {
+                            cout<<8<<endl;
+                            return (D-B)*(C-A)+(H-F)*(G-E)-(C-E)*(H-F);
+                        }
+                        else {
+                            if(F>B&&F<D&&H>D) {
+                                cout<<9<<endl;
+                                return (D-B)*(C-A)+(H-F)*(G-E)-(C-E)*(D-F);
+                            }
+                            else {
+                                cout<<10<<endl;
+                                return (D-B)*(C-A)+(H-F)*(G-E)-(C-E)*(H-B);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+};
