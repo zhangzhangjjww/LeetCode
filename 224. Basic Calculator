@@ -1,0 +1,211 @@
+Implement a basic calculator to evaluate a simple expression string.
+
+The expression string may contain open ( and closing parentheses ), the plus + or minus sign -, non-negative integers and empty spaces .
+
+You may assume that the given expression is always valid.
+
+Some examples:
+"1 + 1" = 2
+" 2-1 + 2 " = 3
+"(1+(4+5+2)-3)+(6+8)" = 23
+Note: Do not use the eval built-in library function.
+
+逆波兰的一般思路，对于输入的字符串，构建两个栈，一个栈中暂存运算符号，另一个栈中存表达式结果。
+
+从头到尾一遍扫描字符串：遇到运算数，则直接压入表达式结果栈；遇到运算符，则要根据运算符优先级分情况处理。
+
+运算符情况：1.左括号：直接压入符号栈。
+
+                 2.加号、减号，优先级最低，所以要将栈中的加减乘除号先出栈到表达式结果栈，再将加减号入栈。
+
+　　　　　　3.乘号、除号，优先级最高，所以只需将栈中的乘除号出栈到表达式结果栈，再将此次的乘除号入栈。
+
+　　　　　　4.右括号：将栈中左括号之后入栈的运算符全部出栈到表达式结果栈，左括号出栈。
+
+一遍扫描后，若符号栈不为空，则将其全部出栈到表达式结果栈。即为所求。
+
+while there are input tokens left
+Read the next token from input.
+If the token is a value
+Push it onto the stack.
+Otherwise, the token is an operator (operator here includes both operators and functions).
+It is already known that the operator takes n arguments.
+If there are fewer than n values on the stack
+(Error) The user has not input sufficient values in the expression.
+Else, Pop the top n values from the stack.
+Evaluate the operator, with the values as arguments.
+Push the returned results, if any, back onto the stack.
+If there is only one value in the stack
+That value is the result of the calculation.
+Otherwise, there are more values in the stack
+(Error) The user input has too many values.
+
+
+
+class Solution {
+public:
+    string fix(string s) { //调整括号
+        int i=0;
+        string tmp;
+        while(i<s.size()) {
+            if(s[i]!='(') {
+                tmp+=s[i];
+                ++i;
+            }
+            else {
+                if(i+1<s.size()&&s[i+1]==')') {
+                    if(i+2==s.size()||(i+2<s.size()&&s[i+2]!='(')) {
+                        tmp+='0';
+                    }
+                    i=i+2;
+                }
+                else {
+                    tmp+=s[i];
+                    ++i;
+                }
+            }
+        }
+        cout<<tmp<<endl;
+        return tmp;
+    }
+    int calculate(string s) {
+        if(s.size()==0) {
+            return 0;
+        }
+        stack<string> express;
+        stack<string> operation;
+        s=fix(s);
+        for(int i=0;i<s.size();++i) {
+            if(s[i]==' ') {
+                continue;
+            }
+            if(s[i]=='+'||s[i]=='-') {
+                string ss;
+                ss+=s[i];
+                if(operation.size()==0) {
+                    operation.push(ss);
+                }
+                else {
+                    while(operation.size()!=0&&(operation.top()=="+"||operation.top()=="-"||operation.top()=="/"||operation.top()=="*")) {
+                        express.push(operation.top());
+                        operation.pop();
+                    }
+                    operation.push(ss);
+                }
+                if(operation.top()=="(") {
+                    operation.push(ss);
+                }
+            }
+            else {
+                if(s[i]=='*'||s[i]=='/') {
+                    string ss;
+                    ss+=s[i];
+                    if(operation.size()==0) {
+                        operation.push(ss);
+                    }
+                    else {
+                        while(operation.size()!=0&&(operation.top()=="*"||operation.top()=="/")) {
+                            express.push(operation.top());
+                            operation.pop();
+                        }
+                        operation.push(ss);
+                    }
+                    if(operation.top()=="+"||operation.top()=="-") {
+                        operation.push(ss);
+                    }
+                    if(operation.top()=="(") {
+                        operation.push(ss);
+                    }
+                }
+                else {
+                    if(s[i]=='(') {
+                            string ss;
+                            ss+=s[i];
+                            operation.push(ss);
+                    }
+                    else {
+                        if(s[i]==')') {
+                            while(operation.size()!=0&&operation.top()!="(") {
+                                express.push(operation.top());
+                                operation.pop();
+                            }
+                            if(operation.size()!=0) {
+                                operation.pop();
+                                cout<<"ss"<<endl;
+                            }
+                        }
+                        else {
+                            if(s[i]>='0'&&s[i]<='9') {
+                                string s2;
+                                while(i<s.size()&&s[i]>='0'&&s[i]<='9') {
+                                    s2+=s[i];
+                                    ++i;
+                                }
+                                express.push(s2);
+                                --i;
+                            }
+                            else {
+                                return 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        while(operation.size()!=0) {
+            express.push(operation.top());
+            operation.pop();
+        }
+        if(express.size()==0) {
+            return 0;
+        }
+        vector<string> tmp;
+        while(express.size()!=0) {
+            tmp.push_back(express.top());
+            express.pop();
+        }
+        for(int i=0,j=tmp.size()-1;i<j;++i,--j) {
+            string c=tmp[i];
+            tmp[i]=tmp[j];
+            tmp[j]=c;
+        }
+        for(int i=0;i!=tmp.size();++i) {
+            cout<<tmp[i]<<endl;
+        }
+        return solve(tmp);
+    }
+    int solve(vector<string> s) {
+        stack<int> val;
+        for(int i=0;i<s.size();++i) {
+            if(s[i][0]>='0'&&s[i][0]<='9') {
+                int re=0;
+                for(int j=0;j!=s[i].size();++j) {
+                    re=re*10+s[i][j]-'0';
+                }
+                val.push(re);
+            }
+            else {
+                if(val.size()<2) {
+                    return 0;
+                }
+                int a=val.top();
+                val.pop();
+                int b=val.top();
+                val.pop();
+                if(s[i]=="+") {
+                    val.push(a+b);
+                }
+                else {
+                    val.push(b-a);
+                }
+            }
+        }
+        cout<<val.size()<<endl;
+        if(val.size()==1) {
+            return val.top();
+        }
+        else {
+            return 0;
+        }
+    }
+};
