@@ -1,0 +1,62 @@
+Given an integer array of size n, find all elements that appear more than ⌊ n/3 ⌋ times. The algorithm should run in linear time and in O(1) space.
+
+
+
+类似于 Majority Element 中的第六种算法Boyer-Moore Majority Vote Algorithm，由于最多有两个可能的元素，所以我们使用两个 candidate，每个 candidate 对应一个 counter。Majority Element 中若两个元素不同，则去除这两个元素并不影响剩余数组的多数元素。类似的，在本题中，如果去除三个不同的元素，并不影响剩余数组的出现次数多于⌊n/3⌋的元素。先判断当前元素是否与 candidate 相匹配，若不匹配，则判断是否要更新 candidate，若也不需要更新，则已经获取了三个不同的元素，即当前元素和两个 candidate，去除的方式是两个 counter 同时减一。
+
+需要注意的是，循环中判断的顺序很重要，需要先判断当前元素是否与两个 candidate 之一相匹配，若均不匹配，再判断 counter。这就需要考虑，最初的 candidate 需要如何确定。即便数组的长度大于等于2，依旧不能类似 Majority Element 那样，使用数组的前两个元素作为两个 candidate，因为数组的前两个元素可能是相同的。其实解决办法也很简单，只要给两个 candidate 赋予不同的初值，并且两个 counter 的初值均为 0 即可。
+
+如果先判断 counter，则有可能出现两个 candidate 相同的情况。如测试用例[2,2]，[−1,1,1,1,2,1]
+
+class Solution {
+public:
+    vector<int> majorityElement(vector<int>& nums) {
+        vector<int> re;
+        int n1=0,count1=0,n2=1,count2=0;
+        for(int i=0;i!=nums.size();++i) {
+            if(nums[i]==n1) {
+                ++count1;
+            }
+            else {
+                if(nums[i]==n2) {
+                    ++count2;
+                }
+                else {
+                    if(count1==0) {
+                        ++count1;
+                        n1=nums[i];
+                    }
+                    else {
+                        if(count2==0) {
+                            ++count2;
+                            n2=nums[i];
+                        }
+                        else {
+                            --count1;
+                            --count2;
+                        }
+                    }
+                }
+            }
+        }
+        if(count1!=0&&is(n1,nums)) {
+            re.push_back(n1);
+        }
+        if(count2!=0&&is(n2,nums)) {
+            re.push_back(n2);
+        }
+        return re;
+    }
+    bool is(int n,vector<int>& nums) {
+        int count=0;
+        for(int i=0;i!=nums.size();++i) {
+            if(nums[i]==n) {
+                ++count;
+            }
+        }
+        if(count>nums.size()/3) {
+            return true;
+        }
+        return false;
+    }
+};
