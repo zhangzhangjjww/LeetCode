@@ -1,0 +1,63 @@
+Given an array of n integers where n > 1, nums, return an array output such that output[i] is equal to the product of all the elements of nums except nums[i].
+
+Solve it without division and in O(n).
+
+For example, given [1,2,3,4], return [24,12,8,6].
+
+Follow up:
+Could you solve it with constant space complexity? (Note: The output array does not count as extra space for the purpose of space complexity analysis.)
+
+
+class Solution {
+public:
+    vector<int> productExceptSelf(vector<int>& nums) {
+       // vector<int> v1,v2;
+        vector<int> re;
+        int key1=1,key2=1;
+        
+        
+       /* v1.push_back(1);
+        v2.push_back(1);
+        for(int i=0;i!=nums.size();++i) {
+            key1*=nums[i];
+            key2*=nums[nums.size()-i-1];
+            v1.push_back(key1);
+            v2.push_back(key2);
+        }
+        for(int i=0,j=v2.size()-1;i<j;++i,--j) {
+            int tmp=v2[i];
+            v2[i]=v2[j];
+            v2[j]=tmp;
+        }
+        vector<int> re;
+        for(int i=0;i!=nums.size();++i) {
+            re.push_back(v1[i]*v2[i+1]);
+        }
+        return re;*/
+        
+        
+        re.push_back(1);
+        for(int i=0;i!=nums.size()-1;++i) {
+            key2*=nums[nums.size()-i-1];
+            re.push_back(key2);
+        }
+        for(int i=0;i!=nums.size();++i) {
+            key1*=nums[i];
+            nums[i]=key1;
+        }
+        nums.push_back(1);
+        for(int i=nums.size()-1;i!=0;--i) {
+            nums[i]=nums[i-1];
+        }
+        nums[0]=1;
+        for(int i=0;i!=nums.size();++i) {
+            re[i]*=nums[nums.size()-i-2];
+        }
+        for(int i=0,j=re.size()-1;i<j;++i,--j) {
+            int tmp=re[i];
+            re[i]=re[j];
+            re[j]=tmp;
+        }
+        return re;
+    }
+};
