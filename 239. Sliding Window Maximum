@@ -1,0 +1,74 @@
+Given an array nums, there is a sliding window of size k which is moving from the very left of the array to the very right. You can only see the k numbers in the window. Each time the sliding window moves right by one position.
+
+For example,
+Given nums = [1,3,-1,-3,5,3,6,7], and k = 3.
+
+Window position                Max
+---------------               -----
+[1  3  -1] -3  5  3  6  7       3
+ 1 [3  -1  -3] 5  3  6  7       3
+ 1  3 [-1  -3  5] 3  6  7       5
+ 1  3  -1 [-3  5  3] 6  7       5
+ 1  3  -1  -3 [5  3  6] 7       6
+ 1  3  -1  -3  5 [3  6  7]      7
+Therefore, return the max sliding window as [3,3,5,5,6,7].
+
+Note: 
+You may assume k is always valid, ie: 1 ≤ k ≤ input array's size for non-empty array.
+
+
+以队列存储序列标号
+在队列中维持一个k长度窗口内的递减元素下标，为什么呢？因为当元素递增时，前面的元素就不需要了，因为最大值肯定不会是它们了。
+顺序扫描每一个元素，当队头的元素超出窗口视野的时候，将对头元素出队；然后检查队尾，如果队尾元素小于或等于当前元素，则队尾元素出队，重复检查队尾直至队列为空或者队尾元素大于当前元素。然后当前元素入队。
+
+class Solution {
+public:
+    vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+        if(nums.size()==0) {
+            return nums;
+        }
+        
+        /*vector<int> re,vol;
+        for(int i=0;i!=k;++i) {
+            vol.push_back(nums[i]);
+        }
+        re.push_back(max(vol));
+        for(int i=k;i!=nums.size();++i) {
+            vol[i%k]=nums[i];
+            re.push_back(max(vol));
+        }
+        return re;
+    }
+    int max(vector<int>& nums) {
+        int re=nums[0];
+        for(int i=1;i<nums.size();++i) {
+            if(re<nums[i]) {
+                re=nums[i];
+            }
+        }
+        return re;
+    }*/
+    
+    
+        deque<int> dq;
+        vector<int> re;
+        for(int i=0;i!=nums.size();++i) {
+             // 每当新数进来时，如果发现队列头部的数的下标，是窗口最左边数的下标，则扔掉  
+            while(dq.size()!=0&&dq.front()<i-k+1) {
+                dq.pop_front();
+            }
+             // 把队列尾部所有比新数小的都扔掉，保证队列是降序的  
+            while(dq.size()!=0&&nums[dq.back()]<nums[i]) {
+                dq.pop_back();
+            }
+            // 加入新数  
+            dq.push_back(i);
+            // 队列头部就是该窗口内第一大的  
+            if(i>=k-1) {
+                re.push_back(nums[dq.front()]);
+            }
+        }
+        return re;
+    }
+};
+
