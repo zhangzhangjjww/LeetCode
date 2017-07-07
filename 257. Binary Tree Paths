@@ -1,0 +1,83 @@
+iven a binary tree, return all root-to-leaf paths.
+
+For example, given the following binary tree:
+
+   1
+ /   \
+2     3
+ \
+  5
+All root-to-leaf paths are:
+
+["1->2->5", "1->3"]
+
+
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<string> binaryTreePaths(TreeNode* root) {
+        vector<string> re;
+        string s;
+        if(root==NULL) {
+            return re;
+        }
+        //s=s+convert(root->val)+"->";
+        solve(root,re,s);
+        return re;
+    }
+    void solve(TreeNode* p,vector<string>& re,string s) {
+        if(p->left==NULL&&p->right==NULL) {
+            s+=convert(p->val);
+            re.push_back(s);
+        }
+        else {
+            s=s+convert(p->val)+"->";
+            string s_left=s,s_right=s;
+            if(p->left) {
+                solve(p->left,re,s_left);
+            }
+            if(p->right) {
+                solve(p->right,re,s_right);
+            }
+        }
+    }
+    string convert(int n) {
+        if(n==0) {
+            return "0";
+        }
+        string s;
+        long tmp=n;
+        if(n<0) {
+            s+='-';
+            tmp*=-1;
+        }
+        while(tmp!=0) {
+            s+=char('0'+tmp%10);
+            tmp/=10;
+        }
+        if(n<0) {
+            for(int i=1,j=s.size()-1;i<j;++i,--j) {
+                char c=s[i];
+                s[i]=s[j];
+                s[j]=c;
+            }
+        }
+        else {
+            for(int i=0,j=s.size()-1;i<j;++i,--j) {
+                char c=s[i];
+                s[i]=s[j];
+                s[j]=c;
+            }
+        }
+        return s;
+    }
+};
