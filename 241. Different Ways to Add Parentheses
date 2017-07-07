@@ -1,0 +1,125 @@
+Given a string of numbers and operators, return all possible results from computing all the different possible ways to group numbers and operators. The valid operators are +, - and *.
+
+
+Example 1
+Input: "2-1-1".
+
+((2-1)-1) = 0
+(2-(1-1)) = 2
+Output: [0, 2]
+
+
+Example 2
+Input: "2*3-4*5"
+
+(2*(3-(4*5))) = -34
+((2*3)-(4*5)) = -14
+((2*(3-4))*5) = -10
+(2*((3-4)*5)) = -10
+(((2*3)-4)*5) = 10
+Output: [-34, -14, -10, -10, 10]
+
+
+class Solution {
+public:
+    vector<int> diffWaysToCompute(string input) {
+        vector<int> re;
+        if(input.empty()) {
+            return re;
+        }
+        vector<string> v;
+        string s;
+        for(int i=0;i!=input.size();++i) {
+            if(i==0&&input[i]=='-') {
+                s+=input[i];
+                continue;
+            }
+            if(input[i]>='0'&&input[i]<='9') {
+                s+=input[i];
+            }
+            else {
+                if(s.size()!=0) {
+                    v.push_back(s);
+                }
+                string tmp;
+                tmp+=input[i];
+                v.push_back(tmp);
+                string tmp2;
+                s=tmp2;
+            }
+        }
+        if(s.size()!=0) {
+            v.push_back(s);
+        }
+        if(v.size()==1) {
+            re.push_back(convert(v[0]));
+            return re;
+        }
+        vector<vector<int>> vol;
+        for(int i=1;i<v.size();i=i+2) {
+            vol.push_back(solve(v,0,i-1,i,i+1,v.size()-1));
+        }
+        for(int i=0;i!=vol.size();++i) {
+            for(int j=0;j!=vol[i].size();++j) {
+                re.push_back(vol[i][j]);
+            }
+        }
+        return re;
+    }
+    vector<int> solve(vector<string>& v,int p1,int r1,int pos,int p2,int r2) {
+        vector<int> re,a,b;
+        vector<vector<int>> one,two;
+        if(p1==r1) {
+            a.push_back(convert(v[p1]));
+            one.push_back(a);
+        }
+        else {
+            for(int i=p1+1;i<r1;i=i+2) {
+                one.push_back(solve(v,p1,i-1,i,i+1,r1));
+            }
+        }
+        if(p2==r2) {
+            b.push_back(convert(v[p2]));
+            two.push_back(b);
+        }
+        else {
+            for(int i=p2+1;i<r2;i=i+2) {
+                two.push_back(solve(v,p2,i-1,i,i+1,r2));
+            }
+        }
+        for(int i=0;i!=one.size();++i) {
+            for(int j=0;j!=one[i].size();++j) {
+                for(int i1=0;i1!=two.size();++i1) {
+                    for(int j1=0;j1!=two[i1].size();++j1) {
+                        if(v[pos]=="-") {
+                            re.push_back(one[i][j]-two[i1][j1]);
+                        }
+                        else {
+                            if(v[pos]=="+") {
+                                re.push_back(one[i][j]+two[i1][j1]);
+                            }
+                            else {
+                                re.push_back(one[i][j]*two[i1][j1]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return re;            
+    }
+    int convert(string s) {
+        int label=1;
+        if(s[0]=='-') {
+            label=-1;
+        }
+        int re=0;
+        for(int i=0;i!=s.size();++i) {
+            if(s[i]=='-'&&i==0) {
+                continue;
+            }
+            re=re*10+s[i]-'0';
+        }
+        return re;
+    }
+};
