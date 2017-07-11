@@ -1,0 +1,122 @@
+Convert a non-negative integer to its english words representation. Given input is guaranteed to be less than 231 - 1.
+
+For example,
+123 -> "One Hundred Twenty Three"
+12345 -> "Twelve Thousand Three Hundred Forty Five"
+1234567 -> "One Million Two Hundred Thirty Four Thousand Five Hundred Sixty Seven"
+
+
+class Solution {
+public:
+    string numberToWords(int num) {
+        string digit[]={"One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve",
+                     "Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"};
+        string tens[]={"Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"};
+        string units[]={"Hundred","Thousand","Million","Billion"};
+        string re;
+        if(num==0) {
+            re+="Zero";
+            return re;
+        }
+        int tmp=num;
+        int count=0;
+        while(tmp) {
+            tmp/=10;
+            ++count;
+        }
+        if(count>=10) {
+            int pos=num/pow(10,9);
+            re+=digit[pos-1];
+            re+=" ";
+            re+=units[3]+" ";
+            num-=pos*pow(10,9);
+        }
+        if(num>=pow(10,6)) {
+            int res=num/pow(10,6);
+            num-=res*pow(10,6);
+            if(res>=100) {
+                int pos1=res/100;
+                re+=digit[pos1-1]+" ";
+                re+=units[0]+" ";
+                res-=pos1*100;
+            }
+            if(res>0) {
+                if(res/10>=2) {
+                    int pos2=res/10;
+                    re+=tens[pos2-2]+" ";
+                    res-=10*pos2;
+                    if(res>0) {
+                        re+=digit[res-1]+" ";
+                    }
+                }
+                else {
+                    re+=digit[res-1]+" ";
+                }
+            }
+            re+=units[2]+" ";
+        }
+        if(num>=pow(10,3)) {
+            int res=num/pow(10,3);
+            num-=res*pow(10,3);
+            if(res>=100) {
+                int pos1=res/100;
+                re+=digit[pos1-1]+" ";
+                re+=units[0]+" ";
+                res-=pos1*100;
+            }
+            if(res>0) {
+                if(res/10>=2) {
+                    int pos2=res/10;
+                    re+=tens[pos2-2]+" ";
+                    res-=10*pos2;
+                    if(res>0) {
+                        re+=digit[res-1]+" ";
+                    }
+                }
+                else {
+                    re+=digit[res-1]+" ";
+                }
+            }
+            re+=units[1]+" ";
+        }
+        if(num>=pow(10,2)) {
+            int res=num/pow(10,2);
+            num-=res*pow(10,2);
+            re+=digit[res-1]+" ";
+            re+=units[0]+" ";
+            if(num>0) {
+                if(num/10>=2) {
+                    int pos2=num/10;
+                    re+=tens[pos2-2]+" ";
+                    num-=10*pos2;
+                    if(num>0) {
+                        re+=digit[num-1]+" ";
+                    }
+                }
+                else {
+                    re+=digit[num-1]+" ";
+                }
+                num=0;
+            }
+        }
+        if(num>0) {
+            if(num/10>=2) {
+                int pos2=num/10;
+                re+=tens[pos2-2]+" ";
+                num-=10*pos2;
+                if(num>0) {
+                    re+=digit[num-1]+" ";
+                }
+            }
+            else {
+                re+=digit[num-1]+" ";
+            }
+            num=0;
+        }
+        string s;
+        for(int i=0;i!=re.size()-1;++i) {
+            s+=re[i];
+        }
+        return s;
+    }
+};
