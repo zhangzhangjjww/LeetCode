@@ -1,0 +1,187 @@
+Given a string that contains only digits 0-9 and a target value, return all possibilities to add binary operators (not unary) +, -, or * between the digits so they evaluate to the target value.
+
+Examples: 
+"123", 6 -> ["1+2+3", "1*2*3"] 
+"232", 8 -> ["2*3+2", "2+3*2"]
+"105", 5 -> ["1*0+5","10-5"]
+"00", 0 -> ["0+0", "0-0", "0*0"]
+"3456237490", 9191 -> []
+
+//此方法正确，但速度慢，会超时
+class Solution {
+public:
+    vector<string> addOperators(string num, int target) {
+        vector<string> re;
+        if(num.size()==0) {
+            return re;
+        }
+        if(num.size()==1) {
+            if(num[0]-'0'==target) {
+                re.push_back(num);
+            }
+            return re;
+        }
+        string s;
+        solution(re,num,-1,0,target,num.size()-1);
+        return re;
+    }
+    void solution(vector<string>& re,string s,int pos,int number,int target,int sz) {
+        solve(re,s,target);
+        if(number<sz) {
+            for(int i=pos+2;i<s.size();++i) {
+                string tmp=s.substr(0,i)+"+"+s.substr(i);
+                solution(re,tmp,i,number+1,target,sz);
+                tmp[i]='-';
+                solution(re,tmp,i,number+1,target,sz);;
+                tmp[i]='*';
+                solution(re,tmp,i,number+1,target,sz);
+            }
+        }
+    }
+    void solve(vector<string>& re,string s,int target) {
+        int i=0;
+        vector<string> tmp;
+        string vol;
+        while(i<s.size()) {
+            if(s[i]>='0'&&s[i]<='9')  {
+                vol+=s[i];
+            }
+            else {
+                if(vol.size()>1&&vol[0]=='0') {
+                    return;
+                }
+                tmp.push_back(vol);
+                string ss;
+                ss+=s[i];
+                tmp.push_back(ss);
+                string s2;
+                vol=s2;
+            }
+            ++i;
+        }
+        if(vol.size()!=0) {
+            if(vol.size()>1&&vol[0]=='0') {
+                return;
+            }
+            tmp.push_back(vol);
+        }
+        vector<string> v;
+        v=convert_expression(tmp);
+        /*if(s=="1+23") {
+            for(int i=0;i!=v.size();++i) {
+                cout<<v[i]<<" ";
+            }
+            cout<<calculate(v)<<endl;
+        }*/
+        if(calculate(v)==target) {
+            re.push_back(s);
+        }
+    }
+    vector<string> convert_expression(vector<string>& tmp) {
+        stack<string> result,expression;
+        for(int i=0;i!=tmp.size();++i) {
+            if(tmp[i]=="+"||tmp[i]=="-") {
+                if(expression.size()==0) {
+                    expression.push(tmp[i]);
+                }
+                else {
+                    while(expression.size()!=0&&(expression.top()=="-"||expression.top()=="+"||expression.top()=="*")) {
+                        result.push(expression.top());
+                        expression.pop();
+                    }
+                    expression.push(tmp[i]);
+                }
+            }
+            else {
+                if(tmp[i]=="*") {
+                    if(expression.size()==0) {
+                        expression.push(tmp[i]);
+                    }
+                    else {
+                        while(expression.size()!=0&&(expression.top()=="*")) {
+                            result.push(expression.top());
+                            expression.pop();
+                        }
+                        expression.push(tmp[i]);
+                    }
+                }
+                else {
+                    result.push(tmp[i]);
+                }
+            }
+        }
+        while(expression.size()!=0) {
+            result.push(expression.top());
+            expression.pop();
+        }
+        vector<string> s;
+        while(result.size()!=0) {
+            s.push_back(result.top());
+            result.pop();
+        }
+        for(int i=0,j=s.size()-1;i<j;++i,--j) {
+            string c=s[i];
+            s[i]=s[j];
+            s[j]=c;
+        }
+        return s;
+    }
+    int calculate(vector<string>& v) {
+        stack<int> s;
+        for(int i=0;i!=v.size();++i) {
+            if(v[i]=="+"||v[i]=="-"||v[i]=="*") {
+                int b=s.top();
+                s.pop();
+                int a=s.top();
+                s.pop();
+                if(v[i]=="+") {
+                    //cout<<a<<" "<<b<<" "<<a+b<<endl;
+                    s.push(a+b);
+                }
+                if(v[i]=="-") {
+                    s.push(a-b);
+                }
+                if(v[i]=="*") {
+                    s.push(a*b);
+                }
+            }
+            else {
+                s.push(convert(v[i]));
+            }
+        }
+        return s.top();
+    }
+    int convert(string& s) {
+        int sum=0;
+        for(int i=0;i!=s.size();++i) {
+            sum=sum*10+s[i]-'0';
+        }
+        return sum;
+    }
+};
+
+
+//DFS
+public:
+    vector<string> addOperators(string num, int target) {
+        vector<string> res;
+        addOperatorsDFS(num, target, 0, 0, "", res);
+        return res;
+    }
+    void addOperatorsDFS(string num, int target, long long diff, long long curNum, string out, vector<string> &res) {
+        if (num.size() == 0 && curNum == target) {
+            res.push_back(out);
+        }
+        for (int i = 1; i <= num.size(); ++i) {
+            string cur = num.substr(0, i);
+            if (cur.size() > 1 && cur[0] == '0') return;
+            string next = num.substr(i);
+            if (out.size() > 0) {
+                addOperatorsDFS(next, target, stoll(cur), curNum + stoll(cur), out + "+" + cur, res);
+                addOperatorsDFS(next, target, -stoll(cur), curNum - stoll(cur), out + "-" + cur, res);
+                addOperatorsDFS(next, target, diff * stoll(cur), (curNum - diff) + diff * stoll(cur), out + "*" + cur, res);
+            } else {
+                addOperatorsDFS(next, target, stoll(cur), stoll(cur), cur, res);
+            }
+        }
+    }
