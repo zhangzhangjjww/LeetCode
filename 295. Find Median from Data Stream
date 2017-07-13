@@ -1,0 +1,187 @@
+Median is the middle value in an ordered integer list. If the size of the list is even, there is no middle value. So the median is the mean of the two middle value.
+
+Examples: 
+[2,3,4] , the median is 3
+
+[2,3], the median is (2 + 3) / 2 = 2.5
+
+Design a data structure that supports the following two operations:
+
+void addNum(int num) - Add a integer number from the data stream to the data structure.
+double findMedian() - Return the median of all elements so far.
+For example:
+
+addNum(1)
+addNum(2)
+findMedian() -> 1.5
+addNum(3) 
+findMedian() -> 2
+
+
+
+注意到，整个容器被分隔成了两部分。位于容器左边部分的数据比右边的数据小。另外这里写图片描述 指向的是左边的最大数据，p2 指向的是右边部分最小的数。 
+　　如果能够保证数据容器左边的数据都小于右边的数据，这样即使左右两边内部的数据没有排序，也可以根据左边最大的数和右边最小的数得到中位数。用最大推可以快速的从一个数据容器中找出最大数，最小堆可以快速的从一个数据容器中找出最小的数。 
+　　用一个最大堆实现左边的数据容器，用最小堆实现右边的数据容器。 
+　　首先，要保证数据平均分配到两个堆中。为了实现平均分配，可以在数据的总数目是偶数时把新数据插入到最小堆，否则插入到最大堆中。 
+　　还要保证最大堆中的数据都要小于最小堆中的数据。如果当前数据的总数目是偶数，也就是要插入最小堆，但是它比最大堆中的一些数还要小。此时，先将这个数插入到最大堆中，然后把最大堆中最大的数取出，插入到最小堆中。如果当前数据的总数目是奇数，也就是要插入最大堆，但是它比最小堆中的一些数还要大。此时，先将这个数插入到最小堆中，然后把最小堆中最小的数取出，插入到最大堆中。 
+  
+  
+  
+  class MedianFinder {
+private:
+    vector<int> max_heap,min_heap;
+    int max_size;
+    int min_size;
+    int parent(int i) {
+        if(i%2==0) {
+            return i/2-1;
+        }
+        else {
+            return (i-1)/2;
+        }
+    }
+    void max_heapify(vector<int>& v,int i) {
+        int left=2*i+1;
+        int right=2*(i+1);
+        int max;
+        if(left<max_size&&v[left]>v[i]) {
+            max=left;
+        }
+        else {
+            max=i;
+        }
+        if(right<max_size&&v[right]>v[max]) {
+            max=right;
+        }
+        if(max!=i) {
+            int tmp=v[i];
+            v[i]=v[max];
+            v[max]=tmp;
+            max_heapify(v,max);
+        }
+    }
+    void min_heapify(vector<int>& v,int i) {
+        int left=2*i+1;
+        int right=2*(i+1);
+        int min;
+        if(left<min_size&&v[left]<v[i]) {
+            min=left;
+        }
+        else {
+            min=i;
+        }
+        if(right<min_size&&v[right]<v[min]) {
+            min=right;
+        }
+        if(min!=i) {
+            int tmp=v[i];
+            v[i]=v[min];
+            v[min]=tmp;
+            min_heapify(v,min);
+        }
+    }
+    int extract_max(vector<int>& v) {
+        int max=v[0];
+        v[0]=v[max_size-1];
+        --max_size;
+        max_heapify(v,0);
+        return max;
+    }
+    int extract_min(vector<int>& v) {
+        int min=v[0];
+        v[0]=v[min_size-1];
+        --min_size;
+        min_heapify(v,0);
+        return min;
+    }
+    void max_insert(vector<int>& v,int n) {
+        if(max_size==v.size()) {
+            v.push_back(n);
+            ++max_size;
+        }
+        else {
+            ++max_size;
+            v[max_size-1]=n;
+        }
+        int i=max_size-1;
+        while(i>0&&v[parent(i)]<v[i]) {
+            int tmp=v[parent(i)];
+            v[parent(i)]=v[i];
+            v[i]=tmp;
+            i=parent(i);
+        }
+    }
+    void min_insert(vector<int>& v,int n) {
+        if(min_size==v.size()) {
+            v.push_back(n);
+            ++min_size;
+        }
+        else {
+            ++min_size;
+            v[min_size-1]=n;
+        }
+        int i=min_size-1;
+        while(i>0&&v[parent(i)]>v[i]) {
+            int tmp=v[parent(i)];
+            v[parent(i)]=v[i];
+            v[i]=tmp;
+            i=parent(i);
+        }
+    }
+public:
+    /** initialize your data structure here. */
+    MedianFinder() {
+        max_size=0;
+        min_size=0;
+    }
+    
+    void addNum(int num) {
+        if((max_size+min_size+1)%2==1) {
+            if(min_size==0||num<=min_heap[0]) {
+                max_insert(max_heap,num);
+            }
+            else {
+                min_insert(min_heap,num);
+                max_insert(max_heap,extract_min(min_heap));
+            }
+        }
+        else {
+            if(max_size==0||num>=max_heap[0]) {
+                min_insert(min_heap,num);
+            }
+            else {
+                max_insert(max_heap,num);
+                min_insert(min_heap,extract_max(max_heap));
+            }
+        }
+        //print();
+    }
+    
+    double findMedian() {
+        if((max_size+min_size)%2==1) {
+            return max_heap[0];
+        }
+        else {
+            return (max_heap[0]+min_heap[0])/2.0;
+        }
+    }
+    void print() {
+        cout<<"max:";
+        for(int i=0;i!=max_size;++i) {
+            cout<<max_heap[i]<<" ";
+        }
+        cout<<endl;
+        cout<<"min:";
+        for(int i=0;i!=min_size;++i) {
+            cout<<min_heap[i]<<" ";
+        }
+        cout<<endl;
+    }
+};
+
+/**
+ * Your MedianFinder object will be instantiated and called as such:
+ * MedianFinder obj = new MedianFinder();
+ * obj.addNum(num);
+ * double param_2 = obj.findMedian();
+ */
