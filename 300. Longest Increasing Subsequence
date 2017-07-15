@@ -37,3 +37,83 @@ public:
         return re;
     }
 };
+
+算法二：贪心 + 二分搜索
+数据定义补充：
+开一个栈，将a[0]入栈，每次取栈顶元素top和读到的元素a[i](0<i<n)做比较，如果a[i]> top 则将a[i]入栈；如果a[i]<= top则二分查找栈中的比a[i]大的第1个数，并用a[i]替换它。 最长序列长度即为栈的大小top。
+这是很好理解的，对于x和y，如果x < y且stack[y] < stack[x]，用stack[x]替换stack[y]，此时的最长序列长度没有改变，但序列继续变长的''潜力''增大了。
+举例：原序列为1，5，8，3，6，7
+开始1，5，8相继入栈，此时读到3，用3替换5，得到1，3，8；
+ 再读6，用6替换8，得到1，3，6；
+再读7，得到最终栈为1，3，6，7。最长递增子序列为长度4。
+
+伪代码描述： 
+初始化栈s
+top = 0;
+s[top] = a[i];
+for (i = 1; i < n; i++)  
+if a[i] > s[top] // 将a[i]接在s[top]所代表的子串之后得到一个更长的子序列
+  top = top + 1
+b[top] = a[i]
+else
+   使用二分查找到这样一个j，使得s[j] < a[i] &&  a[i] <= s[j + 1]
+   s[j + 1] = a[i]
+return : top + 1
+算法分析：
+内层循环由于b序列的严格递增性，可以使用二分查找，时间复杂度为O(log n)，乘以外层循环，最终时间复杂度为O(n log n)。
+
+注意：当出现1，5，8，2这种情况时，栈内最后的数是1，2，8不是正确的序列，难道错了？
+分析一下，我们可以看出，虽然有些时候这样得不到正确的序列，但最后算出来的个数是没错的，为什么呢？
+想想，当a[i]>top时，总个数直接加1，这肯定没错；但当a[i]<top时呢？ 这时a[i]会替换栈里面的某一个元素，大小不变，就是说一个小于栈顶的元素加入时，总个数不变。
+这两种情况的分析可以看出，如果只求个数的话，这个算法比较高效；但如果要求打印出序列时，就只能用动态规划了。
+
+
+
+class Solution {
+public:
+    int lengthOfLIS(vector<int>& nums) {
+        if(nums.size()==0) {
+            return 0;
+        }
+        vector<int> v;
+        for(int i=0;i!=nums.size();++i) {
+            if(v.size()==0) {
+                v.push_back(nums[i]);
+            }
+            else {
+                if(nums[i]>v[v.size()-1]) {
+                    v.push_back(nums[i]);
+                }
+                else {
+                    int pos=binary_search(v,0,v.size()-1,nums[i]);
+                    v[pos]=nums[i];
+                }
+            }
+        }
+        return v.size();
+    }
+    int binary_search(vector<int>& v,int p,int r,int target) {
+        if(p<=r) {
+            int q=(p+r)/2;
+            if(q==0&&v[0]>=target) {
+                return q;
+            }
+            else {
+                if(v[q-1]<target&&v[q]>=target) {
+                    return q;
+                }
+                else {
+                    if(v[q]<target) {
+                        return binary_search(v,q+1,r,target);
+                    }
+                    else {
+                        return binary_search(v,p,q-1,target);
+                    }
+                }
+            }
+        }
+        else {
+            return p;
+        }
+    }
+};
