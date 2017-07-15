@@ -1,0 +1,92 @@
+Remove the minimum number of invalid parentheses in order to make the input string valid. Return all possible results.
+
+Note: The input string may contain letters other than the parentheses ( and ).
+
+Examples:
+"()())()" -> ["()()()", "(())()"]
+"(a)())()" -> ["(a)()()", "(a())()"]
+")(" -> [""]
+
+
+
+class Solution {
+public:
+    vector<string> removeInvalidParentheses(string s) {
+        vector<string> re;
+        if(s.empty()) {
+            string emp;
+            re.push_back(emp);
+            return re;
+        }
+        string tmp;
+        stack<char> sta;
+        int count=0;
+        for(int i=0;i!=s.size();++i) {
+            if(s[i]=='(') {
+                sta.push(s[i]);
+            }
+            else {
+                if(s[i]==')') {
+                    if(sta.size()!=0) {
+                        sta.pop();
+                    }
+                    else {
+                        ++count;
+                    }
+                }
+            }
+        }
+        count+=sta.size();
+        cout<<count<<endl;
+        if(count==0) {
+            re.push_back(s);
+            return re;
+        }
+        if(count==s.size()) {
+            string s2;
+            re.push_back(s2);
+            return re;
+        }
+        map<string,int> m;
+        solve(re,s,count,m);
+        return re;
+    }
+    void solve(vector<string>& re,string s,int sz,map<string,int>& m) {
+        if(m.count(s)==0) {
+            m[s]=1;
+            if(sz==0) {
+                if(isVaild(s)) {
+                    re.push_back(s);
+                }
+            }
+            else {
+                for(int i=0;i<s.size();++i) {
+                    string tmp=s.substr(0,i)+s.substr(i+1);
+                    solve(re,tmp,sz-1,m);
+                }
+            }
+        }
+    }
+    bool isVaild(string& s) {
+        if(s.empty()) {
+            return true;
+        }
+        stack<char> sta;
+        for(int i=0;i!=s.size();++i) {
+            if(s[i]=='(') {
+                sta.push(s[i]);
+            }
+            else {
+                if(s[i]==')') {
+                    if(sta.size()!=0) {
+                        sta.pop();
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            }
+        }
+        return sta.size()==0;
+    }
+};
