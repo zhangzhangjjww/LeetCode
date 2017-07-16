@@ -1,0 +1,68 @@
+Given an integer array nums, find the sum of the elements between indices i and j (i ≤ j), inclusive.
+
+The update(i, val) function modifies nums by updating the element at index i to val.
+Example:
+Given nums = [1, 3, 5]
+
+sumRange(0, 2) -> 9
+update(1, 2)
+sumRange(0, 2) -> 8
+Note:
+The array is only modifiable by the update function.
+You may assume the number of calls to update and sumRange function is distributed evenly.
+
+
+于普通数组，其修改的时间复杂度位O(1)，而求数组中某一段的数值和的时间复杂度为O(n)，因此对于n的值过大的情况，普通数组的时间复杂度我们是接受不了的。
+
+在此，我们引入了树状数组的数据结构，它能在O(logn)内对数组的值进行修改和查询某一段数值的和。
+
+树状数组是一个查询和修改复杂度都为log(n)的数据结构，假设数组a[1..n]，那么查询a[1]+...+a[n]的时间是log级别的，而且是一个在线的数据结构，支持随时修改某个元素的值，复杂度也为log级别。
+
+
+
+class NumArray {
+private:
+    vector<int> v,vol;
+public:
+    NumArray(vector<int> nums) {
+        v.resize(nums.size()+1);
+        vol=nums;
+        for(int i=0;i!=nums.size();++i) {
+            add(i+1,nums[i]);
+        }
+    }
+    
+    void update(int i, int val) {
+        int delta=val-vol[i];
+        vol[i]=val;
+        add(i+1,delta);
+    }
+    
+    int sumRange(int i, int j) {
+       return sum(j+1)-sum(i);
+    }
+    int lowbit(int x) {
+        return x&(-x);
+    }
+    void add(int pos,int value) {
+        while(pos<v.size()) {
+            v[pos]+=value;
+            pos+=lowbit(pos);
+        }
+    }
+    int sum(int pos) {
+        int re=0;
+        while(pos>0) {
+            re+=v[pos];
+            pos-=lowbit(pos);
+        }
+        return re;
+    }
+};
+
+/**
+ * Your NumArray object will be instantiated and called as such:
+ * NumArray obj = new NumArray(nums);
+ * obj.update(i,val);
+ * int param_2 = obj.sumRange(i,j);
+ */
