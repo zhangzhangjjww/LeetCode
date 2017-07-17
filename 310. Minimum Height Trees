@@ -1,0 +1,209 @@
+For a undirected graph with tree characteristics, we can choose any node as the root. The result graph is then a rooted tree. Among all possible rooted trees, those with minimum height are called minimum height trees (MHTs). Given such a graph, write a function to find all the MHTs and return a list of their root labels.
+
+Format
+The graph contains n nodes which are labeled from 0 to n - 1. You will be given the number n and a list of undirected edges (each edge is a pair of labels).
+
+You can assume that no duplicate edges will appear in edges. Since all edges are undirected, [0, 1] is the same as [1, 0] and thus will not appear together in edges.
+
+Example 1:
+
+Given n = 4, edges = [[1, 0], [1, 2], [1, 3]]
+
+        0
+        |
+        1
+       / \
+      2   3
+return [1]
+
+Example 2:
+
+Given n = 6, edges = [[0, 3], [1, 3], [2, 3], [4, 3], [5, 4]]
+
+     0  1  2
+      \ | /
+        3
+        |
+        4
+        |
+        5
+return [3, 4]
+
+Note:
+
+(1) According to the definition of tree on Wikipedia: “a tree is an undirected graph in which any two vertices are connected by exactly one path. In other words, any connected graph without simple cycles is a tree.”
+
+(2) The height of a rooted tree is the number of edges on the longest downward path between the root and a leaf.
+
+
+
+//该算法超时
+
+class Solution {
+public:
+    vector<int> findMinHeightTrees(int n, vector<pair<int, int>>& edges) {
+        vector<int> re;
+        if(n==1) {
+            re.push_back(0);
+            return re;
+        }
+        map<int,int> m;
+        for(int i=0;i!=n;++i) {
+            bfs(i,edges,m,n);
+        }
+        int min=n;
+        for(int i=0;i!=n;++i) {
+            if(m[i]<min) {
+                min=m[i];
+            }
+        }
+        for(int i=0;i!=n;++i) {
+            if(m[i]==min) {
+                re.push_back(i);
+            }
+        }
+        return re;
+    }
+    void bfs(int pos,vector<pair<int,int>>& edges,map<int,int>& m,int n) {
+        vector<bool> test(n,false);
+        vector<int> distance(n,0);
+        test[pos]=true;
+        distance[pos]=0;
+        int d=0;
+        queue<int> q;
+        q.push(pos);
+        while(!q.empty()) {
+            queue<int> q2;
+            while(!q.empty()) {
+                int tmp=q.front();
+                q.pop();
+                for(int i=0;i!=edges.size();++i) {
+                    if(edges[i].first==tmp&&!test[edges[i].second]) {
+                        test[edges[i].second]=true;
+                        distance[edges[i].second]=d+1;
+                        q2.push(edges[i].second);
+                    }
+                    if(edges[i].second==tmp&&!test[edges[i].first]) {
+                        test[edges[i].first]=true;
+                        distance[edges[i].first]=d+1;
+                        q2.push(edges[i].first);
+                    }
+                }
+            }
+            ++d;
+            q=q2;
+        }
+        m[pos]=0;
+        for(int i=0;i!=n;++i) {
+            if(m[pos]<distance[i]) {
+                m[pos]=distance[i];
+            }
+        }
+    }
+};
+
+//还会说有问题，会超时
+
+vector<int> findMinHeightTrees(int n, vector<pair<int, int>>& edges) {
+        vector<int> re;
+        if(n==1) {
+            re.push_back(0);
+            return re;
+        }
+        vector<vector<int>> v(n,vector<int>(n,n));
+        for(int i=0;i!=n;++i) {
+            v[i][i]=0;
+        }
+        for(int i=0;i!=edges.size();++i) {
+            v[edges[i].first][edges[i].second]=1;
+            v[edges[i].second][edges[i].first]=1;
+        }
+        /*for(int i=0;i!=n;++i) {
+            for(int j=0;j!=n;++j) {
+                cout<<v[i][j]<<" ";
+            }
+            cout<<endl;
+        }
+        cout<<endl;*/
+        for(int k=0;k!=n;++k) {
+            vector<vector<int>> tmp=v;
+            for(int i=0;i!=n;++i) {
+                for(int j=0;j!=n;++j) {
+                    tmp[i][j]=min(v[i][j],v[i][k]+v[k][j]);
+                }
+            }
+            v=tmp;
+            /*for(int i=0;i!=n;++i) {
+                for(int j=0;j!=n;++j) {
+                    cout<<v[i][j]<<" ";
+                }
+                cout<<endl;
+            }
+            cout<<endl;*/
+        }
+        int min=n;
+        vector<int> distance(n,0);
+        for(int i=0;i!=n;++i) {
+            for(int j=0;j!=n;++j) {
+                if(distance[i]<v[i][j]) {
+                    distance[i]=v[i][j];
+                }
+            }
+            if(min>distance[i]) {
+                min=distance[i];
+            }
+        }
+        for(int i=0;i!=n;++i) {
+            if(distance[i]==min) {
+                re.push_back(i);
+            }
+        }
+        return re;
+    }
+    
+    
+    理解题意：题目的意思是给定一个无向连接图，从中选取一个节点作为root,看做一颗树，返回最小高度的树节点。
+
+当只有一个节点的时候，即n==1,那么就可以直接返回；
+
+当只有两个节点的时候，即n==2，那么这两个节点都是符合条件的，任意一个作为root节点，高度都是一样的，所以需要返回这两个节点。
+
+当n>2时候，必然就会存在叶子节点和中间节点的区别，所谓的叶子节点就是只有一个节点与之连接，中间节点就是至少存在两个节点与之相连接。如果选取叶子节点为root,这样的树高度为height = 1+height(中间节点)。很显然，得到的树高度会大于中间节点。所以按照题意，我们只需要选取中间节点，然后遍历，深度搜索，就能够获得最小高度树的root节点，线性复杂度。
+
+不过可以根据图论的一些知识，来简化本题的解法。逐步的删除叶子节点，最后剩余的一个或者两就是答案。这里应该说明的问题的是，符合条件的节点最多只有两个，为什么呢?
+
+假设存在三个点，说明以这三个点为root的树高度是一样的，就是到达最远叶子节点的路径长度是一样的，现在我们逐步删除叶子节点，这样三个点为root的树高度应该逐步减1，最后如果高度都减为0，说明有三个根节点也就是三棵树，这三个节点是独立的，违背了树的定义。
+
+
+
+class Solution {
+public:
+    vector<int> findMinHeightTrees(int n, vector<pair<int, int>>& edges) {
+        if (n == 1) return {0};
+        vector<int> res;
+        vector<unordered_set<int>> adj(n);
+        queue<int> q;
+        for (auto edge : edges) {
+            adj[edge.first].insert(edge.second);
+            adj[edge.second].insert(edge.first);
+        }
+        for (int i = 0; i < n; ++i) {
+            if (adj[i].size() == 1) q.push(i);
+        }
+        while (n > 2) {
+            int size = q.size();
+            n -= size;
+            for (int i = 0; i < size; ++i) {
+                int t = q.front(); q.pop();
+                for (auto a : adj[t]) {
+                    adj[a].erase(t);
+                    if (adj[a].size() == 1) q.push(a);
+                }
+            }
+        }
+        while (!q.empty()) {
+            res.push_back(q.front()); q.pop();
+        }
+        return res;
+    }
+};
