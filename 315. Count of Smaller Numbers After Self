@@ -1,0 +1,256 @@
+You are given an integer array nums and you have to return a new counts array. The counts array has the property where counts[i] is the number of smaller elements to the right of nums[i].
+
+Example:
+
+Given nums = [5, 2, 6, 1]
+
+To the right of 5 there are 2 smaller elements (2 and 1).
+To the right of 2 there is only 1 smaller element (1).
+To the right of 6 there is 1 smaller element (1).
+To the right of 1 there is 0 smaller element.
+Return the array [2, 1, 1, 0].
+
+
+//二叉树求解超时
+class Solution {
+public:
+    struct Node {
+        int val;
+        int sz;
+        int pos;
+        Node* left;
+        Node* right;
+        Node(int v,int p):val(v),sz(0),pos(p),left(NULL),right(NULL) {}
+    };
+    void insert(Node* root,int v,int po) {
+        Node* p=new Node(v,po);
+        Node* tmp=root,*pre=NULL;
+        count_number(root,p);
+        while(tmp) {
+            pre=tmp;
+            if(p->val<tmp->val) {
+                tmp=tmp->left;
+            }
+            else {
+                tmp=tmp->right;
+            }
+        }
+        if(p->val<pre->val) {
+            pre->left=p;
+        }
+        else {
+            pre->right=p;
+        }
+    }
+    void count_number(Node* root,Node* p) {
+        if(root->left) {
+            count_number(root->left,p);
+        }
+        if(root->val>p->val&&p->pos>root->pos) {
+            ++root->sz;
+        }
+        if(root->right) {
+            count_number(root->right,p);
+        }
+    }
+    void delete_Node(Node* root) {
+        if(root->left) {
+            delete_Node(root->left);
+        }
+        if(root->right) {
+            delete_Node(root->right);
+        }
+        delete root;
+    }
+    void set(vector<int>& v,Node* root) {
+        if(root->left) {
+            set(v,root->left);
+        }
+        v[root->pos]=root->sz;
+        if(root->right) {
+            set(v,root->right);
+        }
+    }
+    vector<int> countSmaller(vector<int>& nums) {
+        int n=nums.size();
+        if(n==0) {
+            vector<int> re;
+            return re;
+        }
+        vector<int> re(n,0);
+        Node* root=new Node(nums[0],0);
+        for(int i=1;i<n;++i) {
+            insert(root,nums[i],i);
+        }
+        set(re,root);
+        delete_Node(root);
+        return re;
+    }
+};
+
+//重复计算count_number浪费时间
+//因此，改用以下方法，用sz保存小于该节点的数目，dup保存重复数目，保证节点的值都不相同，满足条件
+
+class Solution {
+public:
+    struct Node {
+        int val;
+        int sz;
+        int dup;
+        Node* left;
+        Node* right;
+        Node(int v):val(v),sz(0),dup(0),left(NULL),right(NULL) {}
+    };
+    int insert(Node* root,int v) {
+        int re=0;
+        Node* tmp=root,*pre=NULL;
+        while(tmp) {
+            pre=tmp;
+            if(v<tmp->val) {
+                ++tmp->sz;
+                tmp=tmp->left;
+            }
+            else {
+                if(v>tmp->val) {
+                    re+=tmp->sz+1+tmp->dup;
+                }
+                else {
+                    re+=tmp->sz;
+                    ++tmp->dup;
+                    return re;
+                }
+                tmp=tmp->right;
+            }
+        }
+        Node* p=new Node(v);
+        if(p->val<pre->val) {
+            pre->left=p;
+        }
+        else {
+            pre->right=p;
+        }
+        return re;
+    }
+    void delete_Node(Node* root) {
+        if(root->left) {
+            delete_Node(root->left);
+        }
+        if(root->right) {
+            delete_Node(root->right);
+        }
+        delete root;
+    }
+    vector<int> countSmaller(vector<int>& nums) {
+        int n=nums.size();
+        if(n==0) {
+            vector<int> re;
+            return re;
+        }
+        vector<int> re(n,0);
+        Node* root=new Node(nums[n-1]);
+        for(int i=n-2;i>-1;--i) {
+            re[i]=insert(root,nums[i]);
+        }
+        delete_Node(root);
+        return re;
+    }
+};
+//逆序对，自己写的merge——sort，还是会超时
+    vector<int> countSmaller(vector<int>& nums) {
+        int n=nums.size();
+        if(n==0) {
+            vector<int> re;
+            return re;
+        }
+        vector<int> re(n,0);
+        vector<pair<int,int>> v;
+        for(int i=0;i!=n;++i) {
+            pair<int,int> tmp;
+            tmp.first=i;
+            tmp.second=nums[i];
+            v.push_back(tmp);
+        }
+        merge_sort(re,v,0,n-1);
+        return re;
+    }
+    void merge_sort(vector<int>& re,vector<pair<int,int>>& v,int p,int r) {
+        if(p<r) {
+            int q=(p+r)/2;
+            merge_sort(re,v,p,q);
+            merge_sort(re,v,q+1,r);
+            int right=q+1;
+            for(int i=p;i<q+1;++i) {
+                while(right<r+1&&v[i].second>v[right].second) {
+                    ++right;
+                }
+                re[v[i].first]+=right-q-1;
+            }
+            merge(v,p,q,r);
+        }
+    }
+    void merge(vector<pair<int,int>>& v,int p,int q,int r) {
+        int left=q-p+1;
+        int right=r-q;
+        int* L=new int[left+1];
+        int* L_p=new int[left+1];
+        int* R=new int[right+1];
+        int* R_p=new int[right+1];
+        for(int i=0;i!=left;++i) {
+            L[i]=v[p+i].second;
+            L_p[i]=v[p+i].first;
+        }
+        for(int i=0;i!=right;++i) {
+            R[i]=v[q+1+i].second;
+            R_p[i]=v[q+1+i].first;
+        }
+        L[left]=numeric_limits<int>::max();
+        R[right]=numeric_limits<int>::max();
+        int l=0,rr=0;
+        vector<pair<int,int>> tmp=v;
+        for(int k=p;k<r+1;++k) {
+            pair<int,int> pair_tmp;
+            if(L[l]<R[rr]) {
+                pair_tmp.first=L_p[l];
+                pair_tmp.second=L[l];
+                ++l;
+            }
+            else {
+                pair_tmp.first=R_p[rr];
+                pair_tmp.second=R[rr];
+                ++rr;
+            }
+            tmp[k]=pair_tmp;
+        }
+        delete [] L;
+        delete [] L_p;
+        delete [] R;
+        delete [] R_p;
+        v=tmp;
+    }
+};
+
+//别人写的
+
+void mergeSort(vector<pair<int, int>>& nums, int low, int high, vector<int> &ans)  
+    {  
+        if(low+1 == high) return;  
+        int mid = (low+high)/2, right = mid;  
+        mergeSort(nums, low, mid, ans);  
+        mergeSort(nums, mid, high, ans);  
+        for(int i = low; i < mid; i++)  
+        {  
+            while(right < high && nums[i].first > nums[right].first) right++;  
+            ans[nums[i].second] += right-mid;  
+        }  
+        inplace_merge(nums.begin()+low, nums.begin()+mid, nums.begin()+right);  
+    }  
+      
+    vector<int> countSmaller(vector<int>& nums) {  
+        if(nums.size()==0) return {};  
+        int len = nums.size();  
+        vector<int> ans(len, 0);  
+        vector<pair<int, int>> vec;  
+        for(int i =0; i < len; i++) vec.push_back(make_pair(nums[i], i));  
+        mergeSort(vec, 0, len, ans);  
+        return ans;  
+    }  
