@@ -1,0 +1,43 @@
+You are given coins of different denominations and a total amount of money amount. Write a function to compute the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return -1.
+
+Example 1:
+coins = [1, 2, 5], amount = 11
+return 3 (11 = 5 + 5 + 1)
+
+Example 2:
+coins = [2], amount = 3
+return -1.
+
+Note:
+You may assume that you have an infinite number of each kind of coin.
+
+
+class Solution {
+public:
+    int coinChange(vector<int>& coins, int amount) {
+        sort(coins.begin(),coins.end());
+        int* p=new int[amount+1];
+        for(int i=0;i<amount+1;++i) {
+            p[i]=amount+1;
+        }
+        p[0]=0;
+        for(int i=0;i<coins.size();++i) {
+            for(int j=amount;j>0;--j) {
+                for(int k=1;k*coins[i]<=j;++k) {
+                    if(p[j-k*coins[i]]!=amount+1) {
+                        p[j]=min(p[j],p[j-k*coins[i]]+k);
+                    }
+                }
+            }
+        }
+        int re=p[amount];
+        cout<<re<<endl;
+        delete [] p;
+        if(re==amount+1) {
+            return -1;
+        }
+        else {
+            return re;
+        }
+    }
+};
