@@ -1,0 +1,82 @@
+Given an integer array nums, return the number of range sums that lie in [lower, upper] inclusive.
+Range sum S(i, j) is defined as the sum of the elements in nums between indices i and j (i ? j), inclusive.
+
+Note:
+A naive algorithm of O(n2) is trivial. You MUST do better than that.
+
+Example:
+Given nums = [-2, 5, -1], lower = -2, upper = 2,
+Return 3.
+The three ranges are : [0, 0], [2, 2], [0, 2] and their respective sums are: -2, -1, 2.
+
+
+一个更好的方法是利用分治法来处理. 即利用归并排序算法的将数组分成左右两边, 在合并左右数组的时候对于左边数组中的每一个元素在右边数组找到一个范围, 使得在这个范围中的的元素与左边的元素构成的区间和落在[lower, upper]之间.  即在右边数组找到两个边界, 设为m, n, 其中m是在右边数组中第一个使得sum[m] - sum[i] >= lower的位置, n是第一个使得sum[n] - sum[i] > upper的位置, 这样n-m就是与左边元素i所构成的位于[lower, upper]范围的区间个数. 因为左右两边都是已经有序的, 这样可以避免不必要的比较.
+
+
+
+
+class Solution {
+public:
+    int countRangeSum(vector<int>& nums, int lower, int upper) {
+        int re=0;
+        vector<long> sum;
+        long val=0;
+        sum.push_back(0);
+        for(int i=0;i<nums.size();++i) {
+            val+=nums[i];
+            sum.push_back(val);
+        }
+        solve(re,sum,0,sum.size()-1,lower,upper);
+        //for(int i=0;i<sum.size();++i) {
+        //    cout<<sum[i]<<' ';
+        //}
+        //cout<<endl;
+        return re;
+    }
+    
+    void solve(int& re,vector<long>& sum,int p,int r,int lower,int upper) {
+        if(p<r) {
+            int q=(p+r)/2;
+            solve(re,sum,p,q,lower,upper);
+            solve(re,sum,q+1,r,lower,upper);
+            //cout<<p<<' '<<q<<' '<<r<<endl;
+            int j=q+1,k=q+1;
+            for(int i=p;i<=q;++i) {
+                while(j<=r&&sum[j]-sum[i]<lower) ++j;
+                while(k<=r&&sum[k]-sum[i]<=upper) ++k;
+                //cout<<k<<' '<<j<<endl;
+                re+=k-j;
+            }
+            merge(sum,p,q,r); 
+        }
+    }
+    
+    void merge(vector<long>& sum,int p,int q,int r) {
+        int n1=q-p+1;
+        int n2=r-q;
+        vector<long> left(n1+1),right(n2+1);
+        for(int i=0;i<n1;++i) {
+            left[i]=sum[p+i];
+        }
+        for(int i=0;i<n2;++i) {
+            right[i]=sum[q+1+i];
+        }
+        left[n1]=numeric_limits<long>::max();
+        right[n2]=numeric_limits<long>::max();
+        int j=0,k=0;
+        for(int i=p;i<=r;++i) {
+            if(left[j]<=right[k]) {
+                sum[i]=left[j];
+                ++j;
+            }
+            else {
+                sum[i]=right[k];
+                ++k;
+            }
+        }
+    }
+    
+        
+ 
+    
+};
