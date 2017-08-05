@@ -1,0 +1,99 @@
+Given an integer matrix, find the length of the longest increasing path.
+
+From each cell, you can either move to four directions: left, right, up or down. You may NOT move diagonally or move outside of the boundary (i.e. wrap-around is not allowed).
+
+Example 1:
+
+nums = [
+  [9,9,4],
+  [6,6,8],
+  [2,1,1]
+]
+Return 4
+The longest increasing path is [1, 2, 6, 9].
+
+Example 2:
+
+nums = [
+  [3,4,5],
+  [3,2,6],
+  [2,2,1]
+]
+Return 4
+The longest increasing path is [3, 4, 5, 6]. Moving diagonally is not allowed.
+
+
+class Solution {
+public:
+    int longestIncreasingPath(vector<vector<int>>& matrix) {
+        int m=matrix.size();
+        if(m==0) {
+            return 0;
+        }
+        int n=matrix[0].size();
+        if(n==0) {
+            return 0;
+        }
+        vector<vector<int>> path(m,vector<int>(n,1));
+        vector<vector<bool>> visit(m,vector<bool>(n,false));
+        for(int i=0;i<m;++i) {
+            for(int j=0;j<n;++j) {
+                if(visit[i][j]==false) {
+                    solve(matrix,visit,path,i,j,m,n);
+                }
+            }
+        }
+        int re=0;
+        for(int i=0;i<m;++i) {
+            for(int j=0;j<n;++j) {
+                if(re<path[i][j]) {
+                    re=path[i][j];
+                }
+            }
+        }
+        return re;
+    }
+    
+    int solve(vector<vector<int>>& matrix,vector<vector<bool>>& visit,vector<vector<int>>& path,int i,int j,int m,int n) {
+        visit[i][j]=true;
+        int left=0,right=0,up=0,down=0;
+        if(j>0&&matrix[i][j]<matrix[i][j-1]) {
+            if(visit[i][j-1]==false) {
+                left=solve(matrix,visit,path,i,j-1,m,n);
+            }
+            else {
+                left=path[i][j-1];
+            }
+        }
+        if(j<n-1&&matrix[i][j]<matrix[i][j+1]) {
+            if(visit[i][j+1]==false) {
+                right=solve(matrix,visit,path,i,j+1,m,n);
+            }
+            else {
+                right=path[i][j+1];
+            }
+        }
+        if(i>0&&matrix[i][j]<matrix[i-1][j]) {
+            if(visit[i-1][j]==false) {
+                up=solve(matrix,visit,path,i-1,j,m,n);
+            }
+            else {
+                up=path[i-1][j];
+            }
+        }
+        if(i<m-1&&matrix[i][j]<matrix[i+1][j]) {
+            if(visit[i+1][j]==false) {
+                down=solve(matrix,visit,path,i+1,j,m,n);
+            }
+            else {
+                down=path[i+1][j];
+            }
+        }
+        path[i][j]=max(path[i][j],left+1);
+        path[i][j]=max(path[i][j],right+1);
+        path[i][j]=max(path[i][j],up+1);
+        path[i][j]=max(path[i][j],down+1);
+        return path[i][j];
+    }
+    
+};
